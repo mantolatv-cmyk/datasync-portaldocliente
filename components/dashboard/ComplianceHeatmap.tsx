@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { ComposableMap, Geographies, Geography, ZoomableGroup } from 'react-simple-maps';
+import { ComposableMap, Geographies, Geography, ZoomableGroup } from '@vnedyalk0v/react19-simple-maps';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Globe } from 'lucide-react';

@@ -6,7 +6,6 @@ import { VendorRiskWidget } from '@/components/dashboard/VendorRiskWidget';
 import { VulnerabilitySummary } from '@/components/dashboard/VulnerabilitySummary';
 import { DataMappingInsight } from '@/components/dashboard/DataMappingInsight';
 import { ActivityTrail } from '@/components/dashboard/ActivityTrail';
-import { ComplianceHeatmap } from '@/components/dashboard/ComplianceHeatmap';
 import { DataLineage } from '@/components/dashboard/DataLineage';
 import { GovernanceScorecard } from '@/components/dashboard/GovernanceScorecard';
 import { EDiscoveryTool } from '@/components/dashboard/EDiscoveryTool';
@@ -65,12 +64,6 @@ export default function Dashboard() {
                     </div>
                     <div className="bento-col-4">
                       <VulnerabilitySummary navigateTo={navigateTo} />
-                    </div>
-                  </div>
-
-                  <div className="bento-row">
-                    <div className="bento-col-12">
-                      <ComplianceHeatmap />
                     </div>
                   </div>
 

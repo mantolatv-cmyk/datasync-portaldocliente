@@ -22,6 +22,17 @@ const nodeTypes = {
   techNode: TechNode,
 };
 
+interface LineageNodeData {
+  label: string;
+  type: string;
+  icon: string;
+  metadata: {
+    retention: string;
+    encryption: string;
+    legalBase: string;
+  };
+}
+
 const initialNodes: Node[] = [
   { 
     id: '1', 
@@ -114,7 +125,7 @@ export const DataLineage: React.FC = () => {
         <SideSheet 
           isOpen={!!selectedNode} 
           onClose={() => setSelectedNode(null)} 
-          title={`Metadados: ${selectedNode?.data?.label || ''}`}
+          title={`Metadados: ${(selectedNode?.data as any)?.label || ''}`}
         >
           {selectedNode && (
             <div className="metadata-sheet">
@@ -124,20 +135,20 @@ export const DataLineage: React.FC = () => {
               </div>
               <div className="metadata-item">
                 <span className="meta-label">Tipo de Ativo:</span>
-                <span className="meta-value">{selectedNode.data.type}</span>
+                <span className="meta-value">{(selectedNode.data as any).type}</span>
               </div>
               <div className="divider"></div>
               <div className="metadata-item">
                 <span className="meta-label">Tempo de Retenção:</span>
-                <span className="meta-value text-accent">{selectedNode.data.metadata.retention}</span>
+                <span className="meta-value text-accent">{(selectedNode.data as any).metadata.retention}</span>
               </div>
               <div className="metadata-item">
                 <span className="meta-label">Criptografia:</span>
-                <span className="meta-value">{selectedNode.data.metadata.encryption}</span>
+                <span className="meta-value">{(selectedNode.data as any).metadata.encryption}</span>
               </div>
               <div className="metadata-item">
                 <span className="meta-label">Base Legal (LGPD):</span>
-                <span className="meta-value">{selectedNode.data.metadata.legalBase}</span>
+                <span className="meta-value">{(selectedNode.data as any).metadata.legalBase}</span>
               </div>
               <div className="divider"></div>
               <p className="description">

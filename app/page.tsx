@@ -64,7 +64,7 @@ export default function Dashboard() {
                       <DataMappingInsight navigateTo={navigateTo} />
                     </div>
                     <div className="bento-col-4">
-                      <VulnerabilitySummary />
+                      <VulnerabilitySummary navigateTo={navigateTo} />
                     </div>
                   </div>
 

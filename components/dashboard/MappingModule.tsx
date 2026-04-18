@@ -26,9 +26,16 @@ interface ProcessingActivity {
   legalBase: string;
   isSensitive: boolean;
   status: 'Ativo' | 'Em Revisão' | 'Arquivado';
+  vendorId?: string;
+  vendorName?: string;
 }
 
-export const MappingModule: React.FC = () => {
+interface MappingModuleProps {
+  navigateTo: (tab: string, filter: string | null) => void;
+  selectedId: string | null;
+}
+
+export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, selectedId }) => {
   const [viewMode, setViewMode] = useState<'table' | 'visual'>('table');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -41,7 +48,9 @@ export const MappingModule: React.FC = () => {
       subjects: 'Colaboradores', 
       legalBase: 'Cumprimento de Contrato / Obrigação Legal',
       isSensitive: true,
-      status: 'Ativo'
+      status: 'Ativo',
+      vendorId: 'V-005',
+      vendorName: 'Soluções Contábeis'
     },
     { 
       id: 'PROC-002', 
@@ -51,7 +60,8 @@ export const MappingModule: React.FC = () => {
       subjects: 'Leads / Clientes', 
       legalBase: 'Consentimento / Legítimo Interesse',
       isSensitive: false,
-      status: 'Ativo'
+      status: 'Ativo',
+      vendorName: 'Interno'
     },
     { 
       id: 'PROC-003', 
@@ -61,7 +71,9 @@ export const MappingModule: React.FC = () => {
       subjects: 'Clientes', 
       legalBase: 'Execução de Contrato',
       isSensitive: false,
-      status: 'Em Revisão'
+      status: 'Em Revisão',
+      vendorId: 'V-001',
+      vendorName: 'AWS Brazil'
     },
     { 
       id: 'PROC-004', 
@@ -162,7 +174,10 @@ export const MappingModule: React.FC = () => {
           </thead>
           <tbody>
             {filteredActivities.map((activity) => (
-              <tr key={activity.id}>
+              <tr 
+                key={activity.id} 
+                className={selectedId === activity.id ? 'active-focus-pulse' : ''}
+              >
                 <td className="font-mono text-secondary">{activity.id}</td>
                 <td>
                   <div className="activity-cell">
@@ -197,10 +212,16 @@ export const MappingModule: React.FC = () => {
                   </div>
                 </td>
                 <td>
-                  <div className="vendor-link">
-                    <Building2 size={14} className="text-secondary" />
-                    <span>{activity.id === 'PROC-001' ? 'Soluções Contábeis' : activity.id === 'PROC-003' ? 'AWS Brazil' : 'Interno'}</span>
-                  </div>
+                  <button 
+                    className={`vendor-link-btn ${activity.vendorId ? 'nav-link' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (activity.vendorId) navigateTo('vendor', activity.vendorId);
+                    }}
+                  >
+                    <Building2 size={14} />
+                    <span>{activity.vendorName || 'Interno'}</span>
+                  </button>
                 </td>
                 <td>
                   <Badge variant={activity.status === 'Ativo' ? 'emerald' : activity.status === 'Em Revisão' ? 'amber' : 'crimson'}>
@@ -421,6 +442,29 @@ export const MappingModule: React.FC = () => {
           gap: 8px;
           font-size: 0.8125rem;
           color: var(--foreground);
+        }
+
+        .vendor-link-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: transparent;
+          border: none;
+          color: var(--secondary);
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 0.8125rem;
+          transition: all 0.2s;
+        }
+
+        .vendor-link-btn.nav-link {
+          color: var(--accent);
+          cursor: pointer;
+        }
+
+        .vendor-link-btn.nav-link:hover {
+          background: rgba(0, 255, 135, 0.1);
+          color: #FFF;
         }
 
         .view-details {

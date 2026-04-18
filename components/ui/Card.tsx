@@ -7,6 +7,8 @@ interface CardProps {
   subtitle?: string;
   className?: string;
   action?: React.ReactNode;
+  onClick?: () => void;
+  isClickable?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({ 
@@ -14,10 +16,16 @@ export const Card: React.FC<CardProps> = ({
   title, 
   subtitle, 
   className = '', 
-  action 
+  action,
+  onClick,
+  isClickable = false
 }) => {
   return (
-    <div className={`card glass card-shine ${className}`}>
+    <div 
+      className={`card glass card-shine ${className}`}
+      onClick={onClick}
+      data-clickable={isClickable}
+    >
       {(title || action) && (
         <div className="card-header">
           <div>

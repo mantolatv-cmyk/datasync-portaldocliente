@@ -10,11 +10,17 @@ const trendData = [
   { value: 190 }, { value: 205 }, { value: 212 }, { value: 234 }
 ];
 
-export const DataMappingInsight: React.FC = () => {
+interface DataMappingInsightProps {
+  navigateTo: (tab: string, filter: string | null) => void;
+}
+
+export const DataMappingInsight: React.FC<DataMappingInsightProps> = ({ navigateTo }) => {
   return (
     <Card 
       title="Fluxo de Dados" 
       subtitle="Inventário Dinâmico de Ativos"
+      onClick={() => navigateTo('mapping', null)}
+      isClickable
     >
       <div className="widget-content">
         <div className="metrics-row">

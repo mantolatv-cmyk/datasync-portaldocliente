@@ -26,7 +26,12 @@ interface Vendor {
   status: 'Compliant' | 'At Risk' | 'Audit Required';
 }
 
-export const VendorModule: React.FC = () => {
+interface VendorModuleProps {
+  navigateTo: (tab: string, filter: string | null) => void;
+  selectedId: string | null;
+}
+
+export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selectedId }) => {
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -107,7 +112,11 @@ export const VendorModule: React.FC = () => {
               const score = calculateRiskScore(vendor);
               const risk = getRiskLevel(score);
               return (
-                <tr key={vendor.id} onClick={() => setSelectedVendor(vendor)}>
+                <tr 
+                  key={vendor.id} 
+                  onClick={() => setSelectedVendor(vendor)}
+                  className={selectedId === vendor.id ? 'active-focus-pulse' : ''}
+                >
                   <td>
                     <div className="vendor-cell">
                       <div className="vendor-icon">
@@ -196,11 +205,17 @@ export const VendorModule: React.FC = () => {
                 <h5 className="section-title">PROCESSOS VINCULADOS (DATA MAPPING)</h5>
                 <p className="section-desc">Este fornecedor opera os seguintes processos de tratamento mapeados na LGPD:</p>
                 <div className="linked-activities">
-                  <div className="activity-link">
+                  <div 
+                    className="activity-link"
+                    onClick={() => navigateTo('mapping', 'PROC-001')}
+                  >
                     <ExternalLink size={14} />
                     <span>Folha de Pagamento Interna</span>
                   </div>
-                  <div className="activity-link">
+                  <div 
+                    className="activity-link"
+                    onClick={() => navigateTo('mapping', 'PROC-003')}
+                  >
                     <ExternalLink size={14} />
                     <span>Hospedagem de Dados - Portal Cliente</span>
                   </div>

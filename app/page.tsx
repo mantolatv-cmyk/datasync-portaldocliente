@@ -18,8 +18,14 @@ import { VendorModule } from '@/components/dashboard/VendorModule';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
 
-  return (
+  const navigateTo = (tab: string, filter: string | null = null) => {
+    setActiveTab(tab);
+    setSelectedFilter(filter);
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
     <div className="portal-container">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
@@ -52,7 +58,7 @@ export default function Dashboard() {
 
                   <div className="bento-row">
                     <div className="bento-col-8">
-                      <DataMappingInsight />
+                      <DataMappingInsight navigateTo={navigateTo} />
                     </div>
                     <div className="bento-col-4">
                       <VulnerabilitySummary />
@@ -79,7 +85,7 @@ export default function Dashboard() {
                   
                   <div className="bento-row">
                     <div className="bento-col-12">
-                      <VendorRiskWidget />
+                      <VendorRiskWidget navigateTo={navigateTo} />
                     </div>
                   </div>
                 </div>
@@ -93,8 +99,8 @@ export default function Dashboard() {
 
           {activeTab === 'forms' && <FormEngine />}
           {activeTab === 'ripd' && <RIPDModule />}
-          {activeTab === 'mapping' && <MappingModule />}
-          {activeTab === 'vendor' && <VendorModule />}
+          {activeTab === 'mapping' && <MappingModule navigateTo={navigateTo} selectedId={selectedFilter} />}
+          {activeTab === 'vendor' && <VendorModule navigateTo={navigateTo} selectedId={selectedFilter} />}
 
           {/* Fallback for tabs not yet implemented */}
           {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && activeTab !== 'vendor' && (

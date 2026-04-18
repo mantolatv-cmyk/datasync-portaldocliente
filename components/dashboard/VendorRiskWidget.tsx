@@ -16,12 +16,16 @@ const assessments = [
   { id: 2, name: 'SaaS Analytics', status: 'Em Revisão', date: '15 Abr 2026' },
 ];
 
-export const VendorRiskWidget: React.FC = () => {
+interface VendorRiskWidgetProps {
+  navigateTo: (tab: string, filter: string | null) => void;
+}
+
+export const VendorRiskWidget: React.FC<VendorRiskWidgetProps> = ({ navigateTo }) => {
   return (
     <Card 
       title="Risco de Terceiros" 
       subtitle="Status da Cadeia de Suprimentos"
-      action={<button className="text-button">Ver Todos</button>}
+      action={<button className="text-button" onClick={() => navigateTo('vendor', null)}>Ver Todos</button>}
     >
       <div className="widget-content">
         <div className="chart-container">

@@ -69,13 +69,14 @@ export const SideSheet: React.FC<SideSheetProps> = ({
           position: absolute;
           top: 0;
           right: 0;
-          width: 480px;
+          width: 420px;
           height: 100%;
-          background: var(--surface);
+          background: rgba(18, 18, 18, 0.95);
+          backdrop-filter: blur(12px);
           border-left: 1px solid var(--border);
           display: flex;
           flex-direction: column;
-          box-shadow: -20px 0 50px rgba(0, 0, 0, 0.5);
+          box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8);
         }
 
         .sidesheet-header {

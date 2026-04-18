@@ -21,6 +21,14 @@ import { LegalVaultModule } from '@/components/dashboard/LegalVaultModule';
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [isBooting, setIsBooting] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsBooting(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const navigateTo = (tab: string, filter: string | null = null) => {
     setActiveTab(tab);
@@ -30,8 +38,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="portal-container">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <>
+      {isBooting && <Preloader />}
+      <div className="portal-container">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <main className="main-viewport">
         <Header />

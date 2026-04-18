@@ -46,17 +46,6 @@ export const IncidentModule: React.FC = () => {
     i.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Aberto': return 'crimson';
-      case 'Contenção': return 'amber';
-      case 'Investigando': return 'cyan';
-      case 'Notificado': return 'secondary';
-      case 'Encerrado': return 'emerald';
-      default: return undefined;
-    }
-  };
-
   const getSeverityBadge = (sev: string) => {
     switch (sev) {
       case 'Crítico': return 'crimson';
@@ -175,7 +164,7 @@ export const IncidentModule: React.FC = () => {
                 </svg>
                 <span className="gauge-label">Score de Impacto</span>
               </div>
-              <div className="impact-info">
+              <div className={`severity-banner bg-${getSeverityBadge(selectedIncident.severity)}`}>
                 <h4>{selectedIncident.type}</h4>
                 <p>Identificado em {selectedIncident.discoveryDate} por {selectedIncident.detectedBy}.</p>
               </div>

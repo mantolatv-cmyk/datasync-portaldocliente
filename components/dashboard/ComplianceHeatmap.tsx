@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+// @ts-ignore
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from '@vnedyalk0v/react19-simple-maps';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';

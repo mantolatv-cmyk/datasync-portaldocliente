@@ -19,7 +19,7 @@ const navItems = [
   { id: 'mapping', label: 'Data Mapping', icon: Map },
   { id: 'forms', label: 'Formulários', icon: ClipboardList },
   { id: 'vendor', label: 'Vendor Risk', icon: ShieldCheck },
-  { id: 'vuln', label: 'Gestão de Vulnerabilidades', icon: BarChart3 },
+  { id: 'vulnerability', label: 'Gestão de Vulnerabilidades', icon: BarChart3 },
   { id: 'incident', label: 'Incidentes e Respostas', icon: AlertTriangle },
   { id: 'ripd', label: 'Relatórios de Impacto', icon: FileText },
 ];

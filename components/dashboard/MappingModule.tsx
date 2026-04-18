@@ -11,7 +11,8 @@ import {
   Users, 
   Scale,
   Download,
-  ExternalLink
+  ExternalLink,
+  Building2
 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';

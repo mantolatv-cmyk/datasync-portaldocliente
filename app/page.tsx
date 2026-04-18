@@ -14,6 +14,7 @@ import { AIRIPDGenerator } from '@/components/dashboard/AIRIPDGenerator';
 import { FormEngine } from '@/components/dashboard/FormEngine';
 import { RIPDModule } from '@/components/dashboard/RIPDModule';
 import { MappingModule } from '@/components/dashboard/MappingModule';
+import { VendorModule } from '@/components/dashboard/VendorModule';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -93,9 +94,10 @@ export default function Dashboard() {
           {activeTab === 'forms' && <FormEngine />}
           {activeTab === 'ripd' && <RIPDModule />}
           {activeTab === 'mapping' && <MappingModule />}
+          {activeTab === 'vendor' && <VendorModule />}
 
           {/* Fallback for tabs not yet implemented */}
-          {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && (
+          {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && activeTab !== 'vendor' && (
             <div className="placeholder-view">
               <h2 className="greeting-title">Módulo em Desenvolvimento</h2>
               <p className="greeting-subtitle">O recurso de {activeTab} está sendo integrado à infraestrutura DataSync.</p>

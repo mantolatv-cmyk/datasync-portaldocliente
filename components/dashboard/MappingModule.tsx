@@ -155,6 +155,7 @@ export const MappingModule: React.FC = () => {
               <th>CATEGORIAS</th>
               <th>TITULARES</th>
               <th>BASE LEGAL</th>
+              <th>OPERADOR / FORNECEDOR</th>
               <th>STATUS</th>
               <th></th>
             </tr>
@@ -193,6 +194,12 @@ export const MappingModule: React.FC = () => {
                   <div className="legal-cell">
                     <Scale size={14} className="text-accent" />
                     <span>{activity.legalBase}</span>
+                  </div>
+                </td>
+                <td>
+                  <div className="vendor-link">
+                    <Building2 size={14} className="text-secondary" />
+                    <span>{activity.id === 'PROC-001' ? 'Soluções Contábeis' : activity.id === 'PROC-003' ? 'AWS Brazil' : 'Interno'}</span>
                   </div>
                 </td>
                 <td>

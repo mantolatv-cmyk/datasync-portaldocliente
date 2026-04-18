@@ -13,7 +13,11 @@ import {
   CheckCircle2, 
   ExternalLink,
   History,
-  LifeBuoy
+  LifeBuoy,
+  Zap,
+  Ban,
+  Server,
+  Terminal
 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
@@ -33,6 +37,28 @@ interface Incident {
 export const IncidentModule: React.FC = () => {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [terminalLogs, setTerminalLogs] = useState<string[]>(['[SYSTEM] Initializing Mission Control...', '[READY] Waiting for directives...']);
+  const [isExecuting, setIsExecuting] = useState(false);
+
+  const executeDirective = (directive: string) => {
+    if (isExecuting) return;
+    setIsExecuting(true);
+    
+    setTerminalLogs(prev => [...prev, `> EXECUTING: ${directive}`]);
+    
+    setTimeout(() => {
+      setTerminalLogs(prev => [...prev, `[PROCESS] Validating credentials for ${selectedIncident?.asset}...`]);
+    }, 400);
+
+    setTimeout(() => {
+      setTerminalLogs(prev => [...prev, `[ACTION] Isolation sequence initiated for ${directive}...`]);
+    }, 1200);
+
+    setTimeout(() => {
+      setTerminalLogs(prev => [...prev, `[SUCCESS] ${directive} completed. Verification confirmed.`]);
+      setIsExecuting(false);
+    }, 2500);
+  };
 
   const incidents: Incident[] = [
     { id: 'INC-2024-001', type: 'Vazamento de Credenciais', asset: 'Internal-ERP', severity: 'Crítico', status: 'Investigando', discoveryDate: '18/04/2024 09:12', detectedBy: 'SIEM Core', impactScore: 88 },
@@ -201,6 +227,47 @@ export const IncidentModule: React.FC = () => {
                     <p>Avaliação de obrigatoriedade ANPD.</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div className="crisis-command-center">
+              <h5 className="section-title text-error flex items-center gap-2">
+                <Zap size={14} /> CRISIS COMMAND CENTER
+              </h5>
+              
+              <div className="terminal-monitor mb-4">
+                {terminalLogs.map((log, idx) => (
+                  <div key={idx} className={`terminal-line ${log.startsWith('>') ? 'cmd' : log.includes('[SUCCESS]') ? 'success' : ''}`}>
+                    {log}
+                  </div>
+                ))}
+                {isExecuting && <div className="terminal-line animate-pulse">_ EXECUTION IN PROGRESS...</div>}
+              </div>
+
+              <div className="directive-grid">
+                <button 
+                  className={`directive-btn ${isExecuting ? 'disabled' : ''}`}
+                  onClick={() => executeDirective('Isolar Integração API')}
+                  disabled={isExecuting}
+                >
+                  <Server size={18} />
+                  <div className="btn-text">
+                    <span className="btn-title">Isolar API</span>
+                    <span className="btn-desc">Corta integrações de terceiros</span>
+                  </div>
+                </button>
+
+                <button 
+                  className={`directive-btn emergency ${isExecuting ? 'disabled' : ''}`}
+                  onClick={() => executeDirective('Global Kill-Switch')}
+                  disabled={isExecuting}
+                >
+                  <Ban size={18} />
+                  <div className="btn-text">
+                    <span className="btn-title">Kill-Switch</span>
+                    <span className="btn-desc">Corta tráfego de dados sensíveis</span>
+                  </div>
+                </button>
               </div>
             </div>
 
@@ -466,6 +533,77 @@ export const IncidentModule: React.FC = () => {
         .text-accent { color: var(--accent); }
         .text-secondary { color: var(--secondary); }
         .text-sm { font-size: 0.8125rem; }
+
+        .crisis-command-center {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          padding: 24px;
+          background: rgba(255, 0, 85, 0.03);
+          border-radius: 16px;
+          border: 1px solid rgba(255, 0, 85, 0.1);
+          margin: 20px 0;
+        }
+
+        .directive-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+
+        .directive-btn {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          color: #FFF;
+          padding: 16px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          text-align: left;
+          transition: all 0.2s;
+          cursor: pointer;
+        }
+
+        .directive-btn:hover:not(.disabled) {
+          border-color: var(--accent);
+          background: rgba(0, 255, 135, 0.05);
+          transform: translateY(-2px);
+        }
+
+        .directive-btn.emergency {
+          border-color: rgba(255, 0, 85, 0.3);
+        }
+
+        .directive-btn.emergency:hover:not(.disabled) {
+          border-color: var(--error);
+          background: rgba(255, 0, 85, 0.1);
+        }
+
+        .directive-btn.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .btn-text {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .btn-title {
+          font-size: 0.8125rem;
+          font-weight: 700;
+        }
+
+        .btn-desc {
+          font-size: 0.625rem;
+          color: var(--secondary);
+        }
+
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .gap-2 { gap: 8px; }
+        .mb-4 { margin-bottom: 16px; }
 
         .anim-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

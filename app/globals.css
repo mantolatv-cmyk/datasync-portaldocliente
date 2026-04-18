@@ -152,6 +152,46 @@ button {
   border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--surface-hover);
+/* Crisis Command & Mission Control Styles */
+.crisis-pulse {
+  animation: crisisAlert 1.5s infinite;
+  border-color: var(--error) !important;
+  background: rgba(255, 0, 85, 0.05) !important;
 }
+
+@keyframes crisisAlert {
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(255, 0, 85, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); }
+}
+
+.terminal-monitor {
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #00FF87;
+  height: 120px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.terminal-monitor::before {
+  content: "TERMINAL OUTPUT";
+  position: absolute;
+  top: 4px;
+  right: 12px;
+  font-size: 0.625rem;
+  opacity: 0.4;
+}
+
+.terminal-line {
+  margin-bottom: 4px;
+  animation: terminalFade 0.23s ease-out forwards;
+}
+
+.terminal-line.cmd { color: #FFF; font-weight: 700; }
+.terminal-line.success { color: var(--accent); }
+.terminal-line.error { color: var(--error); }

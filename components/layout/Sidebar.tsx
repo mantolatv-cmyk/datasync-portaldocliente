@@ -8,6 +8,7 @@ import {
   AlertTriangle, 
   FileText,
   ClipboardList,
+  Library,
   LogOut,
   Settings,
   HelpCircle
@@ -21,6 +22,7 @@ const navItems = [
   { id: 'vendor', label: 'Vendor Risk', icon: ShieldCheck },
   { id: 'vulnerability', label: 'Gestão de Vulnerabilidades', icon: BarChart3 },
   { id: 'incident', label: 'Incidentes e Respostas', icon: AlertTriangle },
+  { id: 'legal-vault', label: 'Vault Jurídico', icon: Library },
   { id: 'ripd', label: 'Relatórios de Impacto', icon: FileText },
 ];
 

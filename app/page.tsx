@@ -15,6 +15,7 @@ import { RIPDModule } from '@/components/dashboard/RIPDModule';
 import { MappingModule } from '@/components/dashboard/MappingModule';
 import { VendorModule } from '@/components/dashboard/VendorModule';
 import { VulnerabilityModule } from '@/components/dashboard/VulnerabilityModule';
+import { IncidentModule } from '@/components/dashboard/IncidentModule';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -98,9 +99,10 @@ export default function Dashboard() {
           {activeTab === 'mapping' && <MappingModule navigateTo={navigateTo} selectedId={selectedFilter} />}
           {activeTab === 'vendor' && <VendorModule navigateTo={navigateTo} selectedId={selectedFilter} />}
           {activeTab === 'vulnerability' && <VulnerabilityModule />}
+          {activeTab === 'incident' && <IncidentModule />}
 
           {/* Fallback for tabs not yet implemented */}
-          {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && activeTab !== 'vendor' && activeTab !== 'vulnerability' && (
+          {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && activeTab !== 'vendor' && activeTab !== 'vulnerability' && activeTab !== 'incident' && (
             <div className="placeholder-view">
               <h2 className="greeting-title">Módulo em Desenvolvimento</h2>
               <p className="greeting-subtitle">O recurso de {activeTab} está sendo integrado à infraestrutura DataSync.</p>

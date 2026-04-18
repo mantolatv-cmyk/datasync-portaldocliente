@@ -16,6 +16,7 @@ import { RIPDModule } from '@/components/dashboard/RIPDModule';
 import { MappingModule } from '@/components/dashboard/MappingModule';
 import { VendorModule } from '@/components/dashboard/VendorModule';
 import { VulnerabilityModule } from '@/components/dashboard/VulnerabilityModule';
+import { IncidentModule } from '@/components/dashboard/IncidentModule';
 import { LegalVaultModule } from '@/components/dashboard/LegalVaultModule';
 import { DSARModule } from '@/components/dashboard/DSARModule';
 

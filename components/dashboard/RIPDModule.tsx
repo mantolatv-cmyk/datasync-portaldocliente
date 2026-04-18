@@ -53,9 +53,9 @@ export const RIPDModule: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'Aprovado': return <Badge variant="neon">Concluído</Badge>;
+      case 'Aprovado': return <Badge variant="emerald">Concluído</Badge>;
       case 'Em Revisão': return <Badge variant="cyan">Em Análise</Badge>;
-      case 'Rascunho': return <Badge variant="secondary">Pendente</Badge>;
+      case 'Rascunho': return <Badge variant="amber">Pendente</Badge>;
       default: return null;
     }
   };

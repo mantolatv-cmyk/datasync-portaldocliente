@@ -11,13 +11,15 @@ import {
   Library,
   LogOut,
   Settings,
-  HelpCircle
+  HelpCircle,
+  UserSearch
 } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 
 const navItems = [
   { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
   { id: 'mapping', label: 'Data Mapping', icon: Map },
+  { id: 'dsar', label: 'Atendimento a Titulares', icon: UserSearch },
   { id: 'forms', label: 'Formulários', icon: ClipboardList },
   { id: 'vendor', label: 'Vendor Risk', icon: ShieldCheck },
   { id: 'vulnerability', label: 'Gestão de Vulnerabilidades', icon: BarChart3 },

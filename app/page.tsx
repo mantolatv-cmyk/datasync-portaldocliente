@@ -16,8 +16,8 @@ import { RIPDModule } from '@/components/dashboard/RIPDModule';
 import { MappingModule } from '@/components/dashboard/MappingModule';
 import { VendorModule } from '@/components/dashboard/VendorModule';
 import { VulnerabilityModule } from '@/components/dashboard/VulnerabilityModule';
-import { IncidentModule } from '@/components/dashboard/IncidentModule';
 import { LegalVaultModule } from '@/components/dashboard/LegalVaultModule';
+import { DSARModule } from '@/components/dashboard/DSARModule';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -125,6 +125,7 @@ export default function Dashboard() {
           {activeTab === 'vulnerability' && <VulnerabilityModule />}
           {activeTab === 'incident' && <IncidentModule />}
           {activeTab === 'legal-vault' && <LegalVaultModule />}
+          {activeTab === 'dsar' && <DSARModule />}
 
           {/* Fallback for tabs not yet implemented */}
           {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && activeTab !== 'vendor' && activeTab !== 'vulnerability' && activeTab !== 'incident' && activeTab !== 'legal-vault' && (

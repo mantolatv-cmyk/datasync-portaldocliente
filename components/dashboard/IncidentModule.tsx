@@ -222,7 +222,7 @@ export const IncidentModule: React.FC = () => {
                   </label>
                   <label className="check-item">
                     <input type="checkbox" />
-                    <span>Volume de titulares > 1000?</span>
+                    <span>Volume de titulares &gt; 1000?</span>
                   </label>
                 </div>
                 <div className="decision-result required">

@@ -479,13 +479,23 @@ export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selected
 
         .full-width { width: 100%; }
 
-        .anim-fade-in {
-          animation: fadeIn 0.4s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+        @media (max-width: 1024px) {
+          .module-container { padding: 16px; gap: 16px; }
+          .module-header { flex-direction: column; gap: 12px; }
+          .header-title { font-size: 1.5rem; }
+          .header-subtitle { font-size: 0.8125rem; }
+          .action-bar { flex-direction: column; align-items: stretch; gap: 16px; }
+          .search-box { width: 100%; }
+          .summary-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+          .stat-card { min-width: 0; padding: 12px; }
+          
+          .table-wrapper { 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; 
+          }
+          .vendor-table { min-width: 900px; }
+          
+          .summary-banner { flex-direction: column; text-align: center; gap: 16px; }
         }
       `}</style>
     </div>

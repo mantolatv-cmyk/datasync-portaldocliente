@@ -1,20 +1,27 @@
 'use client';
 import React from 'react';
-import { ShieldCheck, AlertCircle, Bell, Search } from 'lucide-react';
+import { ShieldCheck, AlertCircle, Bell, Search, Menu } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   return (
     <header className="header glass">
       <div className="header-left">
-        <div className="search-bar">
+        <button className="mobile-menu-btn" onClick={onMenuClick}>
+          <Menu size={24} />
+        </button>
+        <div className="search-bar desktop-only">
           <Search size={18} className="search-icon" />
           <input type="text" placeholder="Pesquisar ativos, fornecedores ou RIPDs..." />
         </div>
       </div>
 
       <div className="header-right">
-        <div className="compliance-status">
+        <div className="compliance-status desktop-only">
           <ShieldCheck size={20} className="status-icon" />
           <div className="status-info">
             <span className="status-label">Conformidade LGPD:</span>
@@ -23,7 +30,7 @@ export const Header: React.FC = () => {
           <Badge variant="cyan">Risco Baixo</Badge>
         </div>
 
-        <div className="vertical-divider"></div>
+        <div className="vertical-divider desktop-only"></div>
 
         <button className="icon-button notification">
           <Bell size={20} />
@@ -32,7 +39,7 @@ export const Header: React.FC = () => {
 
         <button className="cta-button">
           <AlertCircle size={18} />
-          <span>Reportar Incidente</span>
+          <span className="desktop-only">Reportar Incidente</span>
         </button>
       </div>
 
@@ -174,7 +181,19 @@ export const Header: React.FC = () => {
         }
 
         @media (max-width: 1024px) {
-          .search-bar { width: 200px; }
+          .header { padding: 0 16px; }
+          .desktop-only { display: none !important; }
+          .mobile-menu-btn {
+            display: flex;
+            background: transparent;
+            border: none;
+            color: var(--foreground);
+            cursor: pointer;
+          }
+        }
+
+        @media (min-width: 1025px) {
+          .mobile-menu-btn { display: none; }
         }
       `}</style>
     </header>

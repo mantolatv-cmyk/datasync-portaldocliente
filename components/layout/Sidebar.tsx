@@ -29,12 +29,16 @@ const navItems = [
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpen, onClose }) => {
 
   return (
-    <aside className="sidebar">
+    <>
+      <div className={`mobile-backdrop ${isOpen ? 'active' : ''}`} onClick={onClose}></div>
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <Logo />
       </div>
@@ -213,7 +217,42 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
         .logout-button:hover {
           color: var(--error);
         }
+        .mobile-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+          z-index: 990;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s ease;
+        }
+
+        .mobile-backdrop.active {
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        @media (max-width: 1024px) {
+          .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+          }
+
+          .sidebar.open {
+            transform: translateX(0);
+          }
+        }
       `}</style>
-    </aside>
+      </aside>
+    </>
   );
 };

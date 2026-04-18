@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [isBooting, setIsBooting] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -34,18 +35,29 @@ export default function Dashboard() {
   const navigateTo = (tab: string, filter: string | null = null) => {
     setActiveTab(tab);
     setSelectedFilter(filter);
+    setIsSidebarOpen(false);
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setIsSidebarOpen(false);
   };
 
   return (
     <>
       {isBooting && <Preloader />}
       <div className="portal-container">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Sidebar 
+          activeTab={activeTab} 
+          setActiveTab={handleTabChange} 
+          isOpen={isSidebarOpen} 
+          onClose={() => setIsSidebarOpen(false)} 
+        />
       
       <main className="main-viewport">
-        <Header />
+        <Header onMenuClick={() => setIsSidebarOpen(true)} />
         
         <div className="content-scroll">
           {activeTab === 'overview' && (
@@ -211,9 +223,19 @@ export default function Dashboard() {
         }
 
         @media (max-width: 1024px) {
+          .portal-container { padding-left: 0; }
+          .main-viewport { padding-left: 0; }
+          .content-scroll { padding: 16px; }
+          .dashboard-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
           .bento-row {
             flex-direction: column;
+            gap: 16px;
           }
+          .greeting-title { font-size: 1.5rem; }
+          .greeting-subtitle { font-size: 0.8125rem; }
         }
       `}</style>
       </div>

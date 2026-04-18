@@ -502,6 +502,27 @@ export const LegalVaultModule: React.FC = () => {
         .text-secondary { color: var(--secondary); }
         .text-warning { color: #FFA502; }
 
+        @media (max-width: 1024px) {
+          .module-container { padding: 16px; gap: 16px; }
+          .module-header { flex-direction: column; gap: 12px; }
+          .header-title { font-size: 1.5rem; }
+          .header-subtitle { font-size: 0.8125rem; }
+          .stats-strip { flex-direction: column; gap: 8px; }
+          .stat-card { padding: 12px 16px; }
+          .action-bar { flex-direction: column; align-items: stretch; gap: 16px; padding: 16px; }
+          .category-tabs { overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+          .cat-tab { white-space: nowrap; flex-shrink: 0; }
+          .search-box { width: 100%; }
+          .doc-grid { grid-template-columns: 1fr; gap: 12px; }
+          
+          .doc-preview-header { flex-direction: column; text-align: center; gap: 16px; }
+          .doc-badge-large { margin: 0 auto; }
+          .detail-grid { grid-template-columns: 1fr; gap: 12px; }
+          .timeline-container { flex-direction: column; gap: 24px; align-items: flex-start; padding-left: 20px; }
+          .timeline-line { left: 5px; top: 0; bottom: 0; width: 2px; height: 100%; }
+          .time-node { flex-direction: row; align-items: center; gap: 16px; text-align: left; }
+        }
+
         .anim-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 

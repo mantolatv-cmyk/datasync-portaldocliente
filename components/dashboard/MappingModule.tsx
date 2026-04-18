@@ -482,13 +482,21 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
         .text-secondary { color: var(--secondary); }
         .text-accent { color: var(--accent); }
 
-        .anim-fade-in {
-          animation: fadeIn 0.4s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+        @media (max-width: 1024px) {
+          .module-container { padding: 16px; gap: 16px; }
+          .module-header { flex-direction: column; gap: 12px; }
+          .header-title { font-size: 1.5rem; }
+          .header-subtitle { font-size: 0.8125rem; }
+          .action-bar { flex-direction: column; align-items: stretch; gap: 16px; }
+          .search-box { width: 100%; }
+          .action-buttons { flex-wrap: wrap; }
+          .btn { flex: 1; justify-content: center; font-size: 0.75rem; padding: 10px; }
+          
+          .table-wrapper { 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; 
+          }
+          .ropa-table { min-width: 1000px; }
         }
       `}</style>
     </div>

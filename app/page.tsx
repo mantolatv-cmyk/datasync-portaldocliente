@@ -28,7 +28,7 @@ export default function Dashboard() {
             <>
               <div className="content-header">
                 <div className="greeting-section">
-                  <h1 className="greeting-title">Olá, Alex Drexler</h1>
+                  <h1 className="greeting-title">Olá, Fernando Melo</h1>
                   <p className="greeting-subtitle">Sua organização está <span className="highlight">92% em conformidade</span> com a LGPD. 3 ações pendentes.</p>
                 </div>
               </div>

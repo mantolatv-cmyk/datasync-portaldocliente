@@ -67,9 +67,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
 
       <div className="sidebar-footer">
         <div className="user-profile">
-          <div className="user-avatar">AD</div>
+          <div className="user-avatar">FM</div>
           <div className="user-info">
-            <p className="user-name">Alex Drexler</p>
+            <p className="user-name">Fernando Melo</p>
             <p className="user-role">CTO / DPO</p>
           </div>
           <button className="logout-button">

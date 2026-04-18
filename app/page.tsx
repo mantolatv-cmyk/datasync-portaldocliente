@@ -26,6 +26,8 @@ export default function Dashboard() {
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  return (
     <div className="portal-container">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       

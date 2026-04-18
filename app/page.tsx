@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
+import { Preloader } from '@/components/ui/Preloader';
 import { VendorRiskWidget } from '@/components/dashboard/VendorRiskWidget';
 import { VulnerabilitySummary } from '@/components/dashboard/VulnerabilitySummary';
 import { DataMappingInsight } from '@/components/dashboard/DataMappingInsight';

@@ -7,6 +7,7 @@ import {
   BarChart3, 
   AlertTriangle, 
   FileText,
+  ClipboardList,
   LogOut,
   Settings,
   HelpCircle
@@ -16,14 +17,19 @@ import { Logo } from '../ui/Logo';
 const navItems = [
   { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
   { id: 'mapping', label: 'Data Mapping', icon: Map },
+  { id: 'forms', label: 'Formulários', icon: ClipboardList },
   { id: 'vendor', label: 'Vendor Risk', icon: ShieldCheck },
   { id: 'vuln', label: 'Gestão de Vulnerabilidades', icon: BarChart3 },
   { id: 'incident', label: 'Incidentes e Respostas', icon: AlertTriangle },
   { id: 'ripd', label: 'Relatórios de Impacto', icon: FileText },
 ];
 
-export const Sidebar: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+interface SidebarProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
 
   return (
     <aside className="sidebar">

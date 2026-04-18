@@ -1,5 +1,4 @@
-'use client';
-import React from 'react';
+import { useState } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { VendorRiskWidget } from '@/components/dashboard/VendorRiskWidget';
@@ -11,75 +10,92 @@ import { DataLineage } from '@/components/dashboard/DataLineage';
 import { GovernanceScorecard } from '@/components/dashboard/GovernanceScorecard';
 import { EDiscoveryTool } from '@/components/dashboard/EDiscoveryTool';
 import { AIRIPDGenerator } from '@/components/dashboard/AIRIPDGenerator';
+import { FormEngine } from '@/components/dashboard/FormEngine';
 
 export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState('overview');
+
   return (
     <div className="portal-container">
-      <Sidebar />
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <main className="main-viewport">
         <Header />
         
         <div className="content-scroll">
-          <div className="content-header">
-            <div className="greeting-section">
-              <h1 className="greeting-title">Olá, Alex Drexler</h1>
-              <p className="greeting-subtitle">Sua organização está <span className="highlight">92% em conformidade</span> com a LGPD. 3 ações pendentes.</p>
+          {activeTab === 'overview' && (
+            <>
+              <div className="content-header">
+                <div className="greeting-section">
+                  <h1 className="greeting-title">Olá, Alex Drexler</h1>
+                  <p className="greeting-subtitle">Sua organização está <span className="highlight">92% em conformidade</span> com a LGPD. 3 ações pendentes.</p>
+                </div>
+              </div>
+
+              <div className="dashboard-grid">
+                <div className="grid-main">
+                  <div className="bento-row">
+                    <div className="bento-col-12">
+                      <EDiscoveryTool />
+                    </div>
+                  </div>
+
+                  <div className="bento-row">
+                    <div className="bento-col-12">
+                      <AIRIPDGenerator />
+                    </div>
+                  </div>
+
+                  <div className="bento-row">
+                    <div className="bento-col-8">
+                      <DataMappingInsight />
+                    </div>
+                    <div className="bento-col-4">
+                      <VulnerabilitySummary />
+                    </div>
+                  </div>
+
+                  <div className="bento-row">
+                    <div className="bento-col-12">
+                      <ComplianceHeatmap />
+                    </div>
+                  </div>
+
+                  <div className="bento-row">
+                    <div className="bento-col-12">
+                      <GovernanceScorecard />
+                    </div>
+                  </div>
+
+                  <div className="bento-row">
+                    <div className="bento-col-12">
+                      <DataLineage />
+                    </div>
+                  </div>
+                  
+                  <div className="bento-row">
+                    <div className="bento-col-12">
+                      <VendorRiskWidget />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid-side">
+                  <ActivityTrail />
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'forms' && <FormEngine />}
+
+          {/* Fallback for tabs not yet implemented */}
+          {activeTab !== 'overview' && activeTab !== 'forms' && (
+            <div className="placeholder-view">
+              <h2 className="greeting-title">Módulo em Desenvolvimento</h2>
+              <p className="greeting-subtitle">O recurso de {activeTab} está sendo integrado à infraestrutura DataSync.</p>
             </div>
-          </div>
-
-          <div className="dashboard-grid">
-            <div className="grid-main">
-              <div className="bento-row">
-                <div className="bento-col-12">
-                  <EDiscoveryTool />
-                </div>
-              </div>
-
-              <div className="bento-row">
-                <div className="bento-col-12">
-                  <AIRIPDGenerator />
-                </div>
-              </div>
-
-              <div className="bento-row">
-                <div className="bento-col-8">
-                  <DataMappingInsight />
-                </div>
-                <div className="bento-col-4">
-                  <VulnerabilitySummary />
-                </div>
-              </div>
-
-              <div className="bento-row">
-                <div className="bento-col-12">
-                  <ComplianceHeatmap />
-                </div>
-              </div>
-
-              <div className="bento-row">
-                <div className="bento-col-12">
-                  <GovernanceScorecard />
-                </div>
-              </div>
-
-              <div className="bento-row">
-                <div className="bento-col-12">
-                  <DataLineage />
-                </div>
-              </div>
-              
-              <div className="bento-row">
-                <div className="bento-col-12">
-                  <VendorRiskWidget />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid-side">
-              <ActivityTrail />
-            </div>
-          </div>
+          )}
         </div>
       </main>
 
@@ -139,6 +155,11 @@ export default function Dashboard() {
           display: flex;
           flex-direction: column;
           gap: 24px;
+        }
+
+        .placeholder-view {
+          padding: 80px;
+          text-align: center;
         }
 
         .bento-row {

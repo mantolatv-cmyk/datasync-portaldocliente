@@ -20,6 +20,7 @@ import { IncidentModule } from '@/components/dashboard/IncidentModule';
 import { LegalVaultModule } from '@/components/dashboard/LegalVaultModule';
 import { DSARModule } from '@/components/dashboard/DSARModule';
 import { PrivacyCopilot } from '@/components/dashboard/PrivacyCopilot';
+import { calculateGovernanceScores, ScoringInputData } from '@/utils/scoring-engine';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -27,6 +28,16 @@ export default function Dashboard() {
   const [isBooting, setIsBooting] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
+
+  // Simulated metrics for Algorithmic Scoring
+  const scoringData: ScoringInputData = {
+    vendors: { total: 5, hasDPA: 3, hasSecurity: 2 },
+    vulnerabilities: { total: 5, critical: 2, high: 1, mitigated: 1 },
+    dsars: { total: 4, onTime: 3 },
+    processes: { total: 15, complete: 10 }
+  };
+
+  const calculatedScores = calculateGovernanceScores(scoringData);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -100,7 +111,7 @@ export default function Dashboard() {
 
                   <div className="bento-row">
                     <div className="bento-col-12">
-                      <GovernanceScorecard />
+                      <GovernanceScorecard data={calculatedScores} />
                     </div>
                   </div>
 

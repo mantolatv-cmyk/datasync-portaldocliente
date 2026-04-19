@@ -4,11 +4,13 @@ import React from 'react';
 interface BadgeProps {
   children: React.ReactNode;
   variant?: 'cyan' | 'amber' | 'crimson' | 'emerald';
+  className?: string;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
-export const Badge: React.FC<BadgeProps> = ({ children, variant = 'cyan' }) => {
+export const Badge: React.FC<BadgeProps> = ({ children, variant = 'cyan', className = '', onClick }) => {
   return (
-    <span className={`badge badge-${variant}`}>
+    <span className={`badge badge-${variant} ${className}`} onClick={onClick}>
       {children}
       <style jsx>{`
         .badge {

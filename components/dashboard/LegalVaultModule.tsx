@@ -1,5 +1,7 @@
 'use client';
 import React, { useState } from 'react';
+import { useDataSync } from '@/hooks/use-datasync';
+import { LegalDocument } from '@/context/DataContext';
 import { 
   Library, 
   FileText, 
@@ -21,16 +23,6 @@ import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { SideSheet } from '../ui/SideSheet';
 
-interface LegalDocument {
-  id: string;
-  name: string;
-  category: 'DPA' | 'Política' | 'Parecer' | 'Contrato';
-  status: 'Vigente' | 'A Vencer' | 'Expirado' | 'Em Revisão';
-  expiryDate: string;
-  lastUpdated: string;
-  size: string;
-  aiSummary: string;
-}
 
 interface LegalVaultModuleProps {
   navigateTo?: (tab: string, filter: string | null) => void;
@@ -38,56 +30,15 @@ interface LegalVaultModuleProps {
 }
 
 export const LegalVaultModule: React.FC<LegalVaultModuleProps> = ({ navigateTo, onCopilotOpen }) => {
+  const { legalDocuments, toggleLegalStatus } = useDataSync();
   const [selectedDoc, setSelectedDoc] = useState<LegalDocument | null>(null);
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const documents: LegalDocument[] = [
-    { 
-      id: 'DOC-001', 
-      name: 'Acordo de Processamento de Dados (DPA) - AWS', 
-      category: 'DPA', 
-      status: 'Vigente', 
-      expiryDate: '12/12/2025', 
-      lastUpdated: '10/01/2024', 
-      size: '1.2 MB',
-      aiSummary: 'Este documento estabelece as obrigações da AWS como operadora de dados, garantindo conformidade com a LGPD e GDPR. Cláusulas críticas incluem a responsabilidade por sub-operadores e protocolos de notificação de incidentes.'
-    },
-    { 
-      id: 'DOC-002', 
-      name: 'Política de Privacidade Externa v2.4', 
-      category: 'Política', 
-      status: 'A Vencer', 
-      expiryDate: '01/06/2024', 
-      lastUpdated: '01/06/2023', 
-      size: '450 KB',
-      aiSummary: 'Relatório detalhado sobre como os dados dos clientes são coletados via portal. Pontos de atenção: uso de cookies analíticos e compartilhamento com parceiros de marketing mencionados no Anexo B.'
-    },
-    { 
-      id: 'DOC-003', 
-      name: 'Parecer Jurídico: Legítimo Interesse (LIA) - Marketing', 
-      category: 'Parecer', 
-      status: 'Em Revisão', 
-      expiryDate: 'N/A', 
-      lastUpdated: '15/04/2024', 
-      size: '890 KB',
-      aiSummary: 'Avaliação da base legal para campanhas de e-mail marketing. Conclui que o legítimo interesse é aplicável desde que o opt-out seja proeminente e granular.'
-    },
-    { 
-      id: 'DOC-004', 
-      name: 'Contrato de Auditoria de Privacidade - Deloitte', 
-      category: 'Contrato', 
-      status: 'Expirado', 
-      expiryDate: '01/03/2024', 
-      lastUpdated: '01/03/2023', 
-      size: '2.4 MB',
-      aiSummary: 'Acordo de prestação de serviços para auditoria externa anual. Define escopo, confidencialidade e prazos de entrega dos relatórios de conformidade.'
-    },
-  ];
 
   const categories = ['Todos', 'DPA', 'Política', 'Parecer', 'Contrato'];
 
-  const filteredDocs = documents.filter(doc => {
+  const filteredDocs = legalDocuments.filter(doc => {
     const matchesCategory = activeCategory === 'Todos' || doc.category === activeCategory;
     const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -117,16 +68,16 @@ export const LegalVaultModule: React.FC<LegalVaultModuleProps> = ({ navigateTo, 
 
       <div className="stats-strip">
         <div className="stat-card">
-          <span className="label text-secondary">ATUais</span>
-          <span className="value">148</span>
+          <span className="label text-secondary">VIGENTES</span>
+          <span className="value">{legalDocuments.filter(d => d.status === 'Vigente').length}</span>
         </div>
         <div className="stat-card warning">
           <span className="label">PRECISAM REVISÃO</span>
-          <span className="value">05</span>
+          <span className="value">{legalDocuments.filter(d => d.status === 'Em Revisão' || d.status === 'A Vencer').length}</span>
         </div>
         <div className="stat-card expired">
           <span className="label">CONTRATOS EXPIRADOS</span>
-          <span className="value">02</span>
+          <span className="value">{legalDocuments.filter(d => d.status === 'Expirado').length}</span>
         </div>
       </div>
 
@@ -166,7 +117,13 @@ export const LegalVaultModule: React.FC<LegalVaultModuleProps> = ({ navigateTo, 
             <div className="doc-info">
               <div className="doc-top">
                 <span className="doc-id">{doc.id}</span>
-                <Badge variant={getStatusVariant(doc.status)}>{doc.status}</Badge>
+                <Badge 
+                  variant={getStatusVariant(doc.status)} 
+                  className="cursor-pointer hover-pulse" 
+                  onClick={(e) => { e.stopPropagation(); toggleLegalStatus(doc.id); }}
+                >
+                  {doc.status}
+                </Badge>
               </div>
               <h4 className="doc-name">{doc.name}</h4>
               <div className="doc-meta">

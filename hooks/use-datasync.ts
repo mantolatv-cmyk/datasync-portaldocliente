@@ -1,4 +1,4 @@
-import { useData, Vendor, Vulnerability, ProcessingActivity, DSARRequest, RIPD, Incident, ScoreSnapshot } from '../context/DataContext';
+import { useData, Vendor, Vulnerability, ProcessingActivity, DSARRequest, RIPD, Incident, ScoreSnapshot, LegalDocument } from '../context/DataContext';
 import { calculateGovernanceScores, getMaturityInsights, ScoringInputData } from '../utils/scoring-engine';
 
 export const useDataSync = () => {
@@ -54,6 +54,17 @@ export const useDataSync = () => {
     const nextIdx = (statuses.indexOf(activity.status) + 1) % statuses.length;
     updateActivity({ ...activity, status: statuses[nextIdx] });
     addLog(`Atividade ${activity.name} movida para ${statuses[nextIdx]}`, 'Mapping', 'medium');
+  };
+
+  const updateLegalDoc = (doc: LegalDocument) => dispatch({ type: 'UPDATE_LEGAL_DOC', payload: doc });
+
+  const toggleLegalStatus = (id: string) => {
+    const doc = state.legalDocuments.find(d => d.id === id);
+    if (!doc) return;
+    const statuses: LegalDocument['status'][] = ['Vigente', 'A Vencer', 'Em Revisão', 'Expirado'];
+    const nextIdx = (statuses.indexOf(doc.status) + 1) % statuses.length;
+    updateLegalDoc({ ...doc, status: statuses[nextIdx] });
+    addLog(`Documento ${doc.name} atualizado para ${statuses[nextIdx]}`, 'Legal', 'low');
   };
 
   const toggleIncidentStatus = (id: string) => {
@@ -179,6 +190,8 @@ export const useDataSync = () => {
     toggleVulnStatus,
     updateActivity,
     toggleActivityStatus,
+    updateLegalDoc,
+    toggleLegalStatus,
     updateDSAR,
     toggleDSARStatus,
     updateRIPD,

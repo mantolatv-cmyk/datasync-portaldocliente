@@ -19,12 +19,14 @@ import { VulnerabilityModule } from '@/components/dashboard/VulnerabilityModule'
 import { IncidentModule } from '@/components/dashboard/IncidentModule';
 import { LegalVaultModule } from '@/components/dashboard/LegalVaultModule';
 import { DSARModule } from '@/components/dashboard/DSARModule';
+import { PrivacyCopilot } from '@/components/dashboard/PrivacyCopilot';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [isBooting, setIsBooting] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -58,7 +60,10 @@ export default function Dashboard() {
         />
       
       <main className="main-viewport">
-        <Header onMenuClick={() => setIsSidebarOpen(true)} />
+        <Header 
+          onMenuClick={() => setIsSidebarOpen(true)} 
+          onCopilotClick={() => setIsCopilotOpen(true)}
+        />
         
         <div className="content-scroll">
           {activeTab === 'overview' && (
@@ -240,6 +245,10 @@ export default function Dashboard() {
           .greeting-subtitle { font-size: 0.8125rem; }
         }
       `}</style>
+        <PrivacyCopilot 
+          isOpen={isCopilotOpen} 
+          onClose={() => setIsCopilotOpen(false)} 
+        />
       </div>
     </>
   );

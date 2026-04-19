@@ -1,13 +1,14 @@
 'use client';
 import React from 'react';
-import { ShieldCheck, AlertCircle, Bell, Search, Menu } from 'lucide-react';
+import { ShieldCheck, AlertCircle, Bell, Search, Menu, Sparkles } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 
 interface HeaderProps {
   onMenuClick?: () => void;
+  onCopilotClick?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+export const Header: React.FC<HeaderProps> = ({ onMenuClick, onCopilotClick }) => {
   return (
     <header className="header glass">
       <div className="header-left">
@@ -31,6 +32,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         </div>
 
         <div className="vertical-divider desktop-only"></div>
+
+        <button className="icon-button spark-ai" onClick={onCopilotClick} title="Abrir Privacy Copilot">
+          <Sparkles size={22} className="text-accent" />
+          <span className="spark-glow"></span>
+        </button>
 
         <button className="icon-button notification">
           <Bell size={20} />
@@ -178,6 +184,31 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           background: var(--error);
           color: white;
           box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .spark-ai {
+          position: relative;
+          color: var(--accent);
+        }
+
+        .spark-glow {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: var(--accent);
+          filter: blur(15px);
+          opacity: 0.15;
+          border-radius: 50%;
+          z-index: -1;
+          animation: pulse 2s infinite;
+        }
+
+        .text-accent { color: var(--accent); }
+
+        @keyframes pulse {
+          0% { transform: scale(0.9); opacity: 0.1; }
+          50% { transform: scale(1.1); opacity: 0.25; }
+          100% { transform: scale(0.9); opacity: 0.1; }
         }
 
         @media (max-width: 1024px) {

@@ -9,42 +9,28 @@ import {
   ExternalLink 
 } from 'lucide-react';
 
-const activities = [
-  {
-    id: 1,
-    type: 'ripd',
-    message: 'RIPD do sistema financeiro assinado eletronicamente',
-    time: 'Há 12 min',
-    icon: FileCheck,
-    color: 'var(--success)'
-  },
-  {
-    id: 2,
-    type: 'vendor',
-    message: 'Fornecedor X classificado como Risco Médio',
-    time: 'Há 45 min',
-    icon: ShieldAlert,
-    color: 'var(--warning)'
-  },
-  {
-    id: 3,
-    type: 'user',
-    message: 'Novo gestor de privacidade adicionado: Mariana Silva',
-    time: 'Há 2 horas',
-    icon: UserPlus,
-    color: 'var(--accent)'
-  },
-  {
-    id: 4,
-    type: 'system',
-    message: 'Scaneamento de vulnerabilidades rotineiro concluído',
-    time: 'Há 5 horas',
-    icon: Settings,
-    color: 'var(--secondary)'
-  },
-];
+import { useDataSync } from '@/hooks/use-datasync';
 
 export const ActivityTrail: React.FC = () => {
+  const { logs } = useDataSync();
+
+  const getLogIcon = (module: string) => {
+    switch (module) {
+      case 'Security': return ShieldAlert;
+      case 'Vendor': return FileCheck;
+      case 'RIPD': return FileCheck;
+      default: return Settings;
+    }
+  };
+
+  const getLogColor = (severity: string) => {
+    switch (severity) {
+      case 'high': return '#FF4757';
+      case 'medium': return '#FFA502';
+      default: return 'var(--accent)';
+    }
+  };
+
   return (
     <Card 
       title="Feed de Atividades" 
@@ -52,25 +38,33 @@ export const ActivityTrail: React.FC = () => {
     >
       <div className="widget-content">
         <div className="timeline">
-          {activities.map((item, index) => (
-            <div key={item.id} className="timeline-item">
-              <div className="timeline-left">
-                <div className="timeline-icon" style={{ borderColor: item.color }}>
-                  <item.icon size={14} style={{ color: item.color }} />
+          {logs.map((item, index) => {
+            const Icon = getLogIcon(item.module);
+            const color = getLogColor(item.severity);
+            return (
+              <div key={item.id} className="timeline-item">
+                <div className="timeline-left">
+                  <div className="timeline-icon" style={{ borderColor: color }}>
+                    <Icon size={14} style={{ color }} />
+                  </div>
+                  {index !== logs.length - 1 && <div className="timeline-line"></div>}
                 </div>
-                {index !== activities.length - 1 && <div className="timeline-line"></div>}
-              </div>
-              <div className="timeline-right">
-                <div className="item-main">
-                  <p className="item-message">{item.message}</p>
-                  <button className="item-link">
-                    <ExternalLink size={12} />
-                  </button>
+                <div className="timeline-right">
+                  <div className="item-main">
+                    <p className="item-message">{item.action}</p>
+                    <button className="item-link">
+                      <ExternalLink size={12} />
+                    </button>
+                  </div>
+                  <div className="item-meta">
+                    <span className="item-module">{item.module}</span>
+                    <span className="item-dot">•</span>
+                    <span className="item-time">{item.time}</span>
+                  </div>
                 </div>
-                <p className="item-time">{item.time}</p>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <button className="view-more">Ver Todos os Registros</button>

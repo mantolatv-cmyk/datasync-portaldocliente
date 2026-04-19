@@ -1,5 +1,7 @@
 'use client';
 import React, { useState } from 'react';
+import { useDataSync } from '@/hooks/use-datasync';
+import { Incident } from '@/context/DataContext';
 import { 
   AlertOctagon, 
   Activity, 
@@ -23,16 +25,6 @@ import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { SideSheet } from '../ui/SideSheet';
 
-interface Incident {
-  id: string;
-  type: string;
-  asset: string;
-  severity: 'Crítico' | 'Alto' | 'Médio' | 'Baixo';
-  status: 'Aberto' | 'Contenção' | 'Investigando' | 'Notificado' | 'Encerrado';
-  discoveryDate: string;
-  detectedBy: string;
-  impactScore: number;
-}
 
 interface IncidentModuleProps {
   navigateTo?: (tab: string, filter: string | null) => void;
@@ -40,13 +32,14 @@ interface IncidentModuleProps {
 }
 
 export const IncidentModule: React.FC<IncidentModuleProps> = ({ navigateTo, onCopilotOpen }) => {
+  const { incidents, toggleIncidentStatus } = useDataSync();
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [terminalLogs, setTerminalLogs] = useState<string[]>(['[SYSTEM] Initializing Mission Control...', '[READY] Waiting for directives...']);
   const [isExecuting, setIsExecuting] = useState(false);
 
   const executeDirective = (directive: string) => {
-    if (isExecuting) return;
+    if (isExecuting || !selectedIncident) return;
     setIsExecuting(true);
     
     setTerminalLogs(prev => [...prev, `> EXECUTING: ${directive}`]);
@@ -60,17 +53,11 @@ export const IncidentModule: React.FC<IncidentModuleProps> = ({ navigateTo, onCo
     }, 1200);
 
     setTimeout(() => {
-      setTerminalLogs(prev => [...prev, `[SUCCESS] ${directive} completed. Verification confirmed.`]);
+      setTerminalLogs(prev => [...prev, `[SUCCESS] ${directive} directive completed.`]);
+      toggleIncidentStatus(selectedIncident.id);
       setIsExecuting(false);
     }, 2500);
   };
-
-  const incidents: Incident[] = [
-    { id: 'INC-2024-001', type: 'Vazamento de Credenciais', asset: 'Internal-ERP', severity: 'Crítico', status: 'Investigando', discoveryDate: '18/04/2024 09:12', detectedBy: 'SIEM Core', impactScore: 88 },
-    { id: 'INC-2024-002', type: 'Acesso Não Autorizado', asset: 'Database-PROD-01', severity: 'Alto', status: 'Contenção', discoveryDate: '17/04/2024 22:45', detectedBy: 'DLP Agent', impactScore: 65 },
-    { id: 'INC-2024-003', type: 'Erro de Configuração S3', asset: 'Public-Assets-Bucket', severity: 'Médio', status: 'Notificado', discoveryDate: '16/04/2024 14:20', detectedBy: 'External Audit', impactScore: 42 },
-    { id: 'INC-2024-004', type: 'Phishing Report', asset: 'Corporate-Email', severity: 'Baixo', status: 'Encerrado', discoveryDate: '15/04/2024 11:30', detectedBy: 'User Reported', impactScore: 12 },
-  ];
 
   const filteredIncidents = incidents.filter(i => 
     i.id.toLowerCase().includes(searchTerm.toLowerCase()) ||

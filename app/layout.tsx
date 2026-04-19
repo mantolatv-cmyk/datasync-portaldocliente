@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   description: "Portal B2B de PrivacyOps e DPOaaS para gestão de conformidade e riscos.",
 };
 
+import { DataSyncProvider } from "@/context/DataContext";
 import { DPOCopilot } from "@/components/shared/DPOCopilot";
 
 export default function RootLayout({
@@ -22,8 +23,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={inter.variable}>
       <body>
-        {children}
-        <DPOCopilot />
+        <DataSyncProvider>
+          {children}
+          <DPOCopilot />
+        </DataSyncProvider>
       </body>
     </html>
   );

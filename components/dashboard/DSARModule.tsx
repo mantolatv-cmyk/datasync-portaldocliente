@@ -1,5 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { useDataSync } from '@/hooks/use-datasync';
+import { DSARRequest } from '@/context/DataContext';
 import { 
   UserSearch, 
   UserCheck, 
@@ -21,17 +23,6 @@ import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { SideSheet } from '../ui/SideSheet';
 
-interface DSARRequest {
-  id: string;
-  name: string;
-  email: string;
-  type: 'Acesso' | 'Exclusão' | 'Portabilidade' | 'Anonimização' | 'Correção';
-  status: 'Triagem' | 'Processando' | 'Aguardando Titular' | 'Concluído' | 'Cancelado';
-  receivedDate: string;
-  daysRemaining: number;
-  priority: 'Alta' | 'Média' | 'Baixa';
-  idVerified: boolean;
-}
 
 interface DSARModuleProps {
   navigateTo?: (tab: string, filter: string | null) => void;
@@ -39,19 +30,23 @@ interface DSARModuleProps {
 }
 
 export const DSARModule: React.FC<DSARModuleProps> = ({ navigateTo, onCopilotOpen }) => {
+  const { dsars, toggleDSARStatus } = useDataSync();
   const [selectedRequest, setSelectedRequest] = useState<DSARRequest | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [fulfillmentStep, setFulfillmentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const requests: DSARRequest[] = [
-    { id: 'REQ-2024-082', name: 'Juliana Siqueira', email: 'juliana.si@gmail.com', type: 'Acesso', status: 'Processando', receivedDate: '10/04/2024', daysRemaining: 7, priority: 'Alta', idVerified: true },
-    { id: 'REQ-2024-085', name: 'Carlos Alberto Wagner', email: 'carlos.wagner@outlook.com', type: 'Exclusão', status: 'Triagem', receivedDate: '16/04/2024', daysRemaining: 13, priority: 'Alta', idVerified: false },
-    { id: 'REQ-2024-079', name: 'Mariana Lima', email: 'mari.lima@me.com', type: 'Portabilidade', status: 'Aguardando Titular', receivedDate: '02/04/2024', daysRemaining: 0, priority: 'Média', idVerified: true },
-    { id: 'REQ-2024-088', name: 'Roberto Mendes', email: 'roberto.m@empresa.com.br', type: 'Correção', status: 'Concluído', receivedDate: '18/04/2024', daysRemaining: 15, priority: 'Baixa', idVerified: true },
-  ];
+  const handleComplete = () => {
+    if (!selectedRequest) return;
+    setIsProcessing(true);
+    setTimeout(() => {
+      toggleDSARStatus(selectedRequest.id);
+      setIsProcessing(false);
+      setSelectedRequest(null);
+    }, 1500);
+  };
 
-  const filteredRequests = requests.filter(r => 
+  const filteredRequests = dsars.filter(r => 
     r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     r.id.toLowerCase().includes(searchTerm.toLowerCase())
   );

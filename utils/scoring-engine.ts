@@ -6,8 +6,12 @@ export interface ScoringInputData {
   };
   vulnerabilities: {
     total: number;
-    critical: number;
-    high: number;
+    bySeverity: {
+      'Crítico': number;
+      'Alto': number;
+      'Médio': number;
+      'Baixo': number;
+    };
     mitigated: number;
   };
   dsars: {
@@ -18,6 +22,7 @@ export interface ScoringInputData {
     total: number;
     complete: number;
   };
+  weights: { [key: string]: number };
 }
 
 export interface ScoreResult {
@@ -27,35 +32,45 @@ export interface ScoreResult {
   fullMark: number;
 }
 
+export type MaturityTier = 'Iniciante' | 'Gerenciado' | 'Definido' | 'Quantitativo' | 'Otimizado';
+
+export const getMaturityTier = (overallScore: number): { tier: MaturityTier, color: string } => {
+  if (overallScore >= 95) return { tier: 'Otimizado', color: 'var(--accent)' };
+  if (overallScore >= 80) return { tier: 'Quantitativo', color: 'var(--success)' };
+  if (overallScore >= 60) return { tier: 'Definido', color: 'var(--warning)' };
+  if (overallScore >= 40) return { tier: 'Gerenciado', color: 'var(--warning)' };
+  return { tier: 'Iniciante', color: 'var(--error)' };
+};
+
 export const calculateGovernanceScores = (data: ScoringInputData): ScoreResult[] => {
   // 1. Terceiros (TPRM axis)
-  // Weight: 60% DPA, 40% Security Certificates
   const vendorScore = data.vendors.total === 0 ? 100 : 
-    ((data.vendors.hasDPA / data.vendors.total) * 60) + 
-    ((data.vendors.hasSecurity / data.vendors.total) * 40);
+    ((data.vendors.hasDPA / data.vendors.total) * 65) + 
+    ((data.vendors.hasSecurity / data.vendors.total) * 35);
 
-  // 2. Segurança Técnica (Vulnerability axis)
-  // Base 100, penalized by Critical (-15 each) and High (-8 each)
-  const securityPenalty = (data.vulnerabilities.critical * 15) + (data.vulnerabilities.high * 8);
-  const securityScore = Math.max(0, 100 - securityPenalty + (data.vulnerabilities.mitigated * 5));
+  // 2. Segurança Técnica (Weighted Axis)
+  // Penalties are multiplied by criticality weights
+  const penalties = 
+    (data.vulnerabilities.bySeverity['Crítico'] * 15 * (data.weights['Crítico'] || 1)) +
+    (data.vulnerabilities.bySeverity['Alto'] * 8 * (data.weights['Alto'] || 1)) +
+    (data.vulnerabilities.bySeverity['Médio'] * 3 * (data.weights['Médio'] || 1));
+  
+  const securityScore = Math.max(0, 100 - penalties + (data.vulnerabilities.mitigated * 2));
 
-  // 3. Gestão de Direitos (DSAR axis)
-  // Percentage of requests completed on time
+  // 3. Gestão de Direitos
   const rightsScore = data.dsars.total === 0 ? 100 : (data.dsars.onTime / data.dsars.total) * 100;
 
-  // 4. Transparência (RoPA axis)
-  // Completion rate of Data Mapping processes
+  // 4. Transparência (RoPA)
   const transparencyScore = data.processes.total === 0 ? 100 : (data.processes.complete / data.processes.total) * 100;
 
-  // 5. Minimização (Privacy by Design axis)
-  // Simulated metric based on overall security/transparency balance
-  const minimizationScore = (transparencyScore * 0.7) + (securityScore * 0.3);
+  // 5. Governança Adaptativa (Combined)
+  const adaptationScore = (transparencyScore * 0.5) + (securityScore * 0.3) + (vendorScore * 0.2);
 
   return [
     { subject: 'Transparência', A: Math.round(transparencyScore), B: 65, fullMark: 100 },
-    { subject: 'Gestão de Direitos', A: Math.round(rightsScore), B: 40, fullMark: 100 },
-    { subject: 'Segurança Técnica', A: Math.round(securityScore), B: 75, fullMark: 100 },
-    { subject: 'Minimização', A: Math.round(minimizationScore), B: 55, fullMark: 100 },
+    { subject: 'Direitos', A: Math.round(rightsScore), B: 40, fullMark: 100 },
+    { subject: 'Segurança', A: Math.round(securityScore), B: 75, fullMark: 100 },
+    { subject: 'Governança', A: Math.round(adaptationScore), B: 55, fullMark: 100 },
     { subject: 'Terceiros', A: Math.round(vendorScore), B: 50, fullMark: 100 },
   ];
 };
@@ -63,16 +78,24 @@ export const calculateGovernanceScores = (data: ScoringInputData): ScoreResult[]
 export const getMaturityInsights = (scores: ScoreResult[]) => {
   const insights = [];
   
-  const vendorScore = scores.find(s => s.subject === 'Terceiros')?.A || 0;
-  if (vendorScore < 60) {
-    insights.push({ text: 'Risco crítico em Terceiros: Faltam contratos DPA assinados.', type: 'critical' });
-  } else if (vendorScore > 85) {
-    insights.push({ text: 'Líder em Gestão de Terceiros: Conformidade documental em 90%+', type: 'success' });
+  const avg = scores.reduce((acc, curr) => acc + curr.A, 0) / scores.length;
+  
+  if (avg < 50) {
+    insights.push({ text: 'Risco de conformidade elevado. Foco imediato em mapeamento e TPRM.', type: 'critical' });
   }
 
-  const securityScore = scores.find(s => s.subject === 'Segurança Técnica')?.A || 0;
+  const securityScore = scores.find(s => s.subject === 'Segurança')?.A || 0;
   if (securityScore < 70) {
-    insights.push({ text: 'Vulnerabilidades críticas impactando a Segurança Técnica.', type: 'warning' });
+    insights.push({ text: 'Vulnerabilidades em ativos críticos requerem mitigação imediata.', type: 'warning' });
+  }
+
+  const vendorScore = scores.find(s => s.subject === 'Terceiros')?.A || 0;
+  if (vendorScore < 60) {
+     insights.push({ text: 'Gargalo em Terceiros: Aumentar taxa de DPAs assinados.', type: 'warning' });
+  }
+
+  if (avg > 80) {
+    insights.push({ text: 'Organização em nível avançado de maturidade LGPD.', type: 'success' });
   }
 
   return insights;

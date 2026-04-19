@@ -1,5 +1,7 @@
 'use client';
 import React, { useState } from 'react';
+import { useDataSync } from '@/hooks/use-datasync';
+import { Vendor } from '@/context/DataContext';
 import { 
   Building2, 
   ShieldCheck, 
@@ -16,19 +18,6 @@ import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { SideSheet } from '../ui/SideSheet';
 
-interface Vendor {
-  id: string;
-  name: string;
-  category: string;
-  mappedActivities: number;
-  sensitiveActivities: number;
-  lastAudit: string;
-  status: 'Compliant' | 'At Risk' | 'Audit Required';
-  hasDPA: boolean;
-  hasISO: boolean;
-  hasSOC2: boolean;
-  contactEmail: string;
-}
 
 interface VendorModuleProps {
   navigateTo: (tab: string, filter: string | null) => void;
@@ -36,27 +25,9 @@ interface VendorModuleProps {
 }
 
 export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selectedId }) => {
+  const { vendors, toggleVendorStatus } = useDataSync();
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const [vendors, setVendors] = useState<Vendor[]>([
-    { id: 'V-001', name: 'AWS Brazil', category: 'Cloud Infrastructure', mappedActivities: 8, sensitiveActivities: 3, lastAudit: '10/01/2024', status: 'Compliant', hasDPA: true, hasISO: true, hasSOC2: true, contactEmail: 'compliance@amazon.com' },
-    { id: 'V-002', name: 'Salesforce (SaaS)', category: 'CRM', mappedActivities: 4, sensitiveActivities: 1, lastAudit: '15/12/2023', status: 'Compliant', hasDPA: true, hasISO: true, hasSOC2: false, contactEmail: 'privacy@salesforce.com' },
-    { id: 'V-003', name: 'Zendesk Inc.', category: 'Customer Support', mappedActivities: 2, sensitiveActivities: 0, lastAudit: '05/02/2024', status: 'Compliant', hasDPA: true, hasISO: false, hasSOC2: false, contactEmail: 'dpo@zendesk.com' },
-    { id: 'V-004', name: 'Loggi Tecnologia', category: 'Logistics / Delivery', mappedActivities: 3, sensitiveActivities: 2, lastAudit: '20/03/2024', status: 'At Risk', hasDPA: false, hasISO: false, hasSOC2: false, contactEmail: 'privacidade@loggi.com.br' },
-    { id: 'V-005', name: 'Soluções Contábeis LTDA', category: 'Accounting / Payroll', mappedActivities: 1, sensitiveActivities: 1, lastAudit: '02/11/2023', status: 'Audit Required', hasDPA: true, hasISO: false, hasSOC2: false, contactEmail: 'contato@contabil.com.br' },
-  ]);
-
-  const toggleStatus = (id: string) => {
-    setVendors(prev => prev.map(v => {
-      if (v.id === id) {
-        const statuses: Vendor['status'][] = ['Compliant', 'At Risk', 'Audit Required'];
-        const nextIdx = (statuses.indexOf(v.status) + 1) % statuses.length;
-        return { ...v, status: statuses[nextIdx] };
-      }
-      return v;
-    }));
-  };
 
   const calculateRiskScore = (vendor: Vendor) => {
     let score = 0;
@@ -181,7 +152,7 @@ export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selected
                     </div>
                   </td>
                   <td>
-                    <div className="status-toggle-wrapper" onClick={(e) => { e.stopPropagation(); toggleStatus(vendor.id); }}>
+                    <div className="status-toggle-wrapper" onClick={(e) => { e.stopPropagation(); toggleVendorStatus(vendor.id); }}>
                       <Badge variant={vendor.status === 'Compliant' ? 'emerald' : vendor.status === 'At Risk' ? 'crimson' : 'amber'}>
                         {vendor.status}
                       </Badge>

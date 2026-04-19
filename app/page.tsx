@@ -20,24 +20,52 @@ import { IncidentModule } from '@/components/dashboard/IncidentModule';
 import { LegalVaultModule } from '@/components/dashboard/LegalVaultModule';
 import { DSARModule } from '@/components/dashboard/DSARModule';
 import { PrivacyCopilot } from '@/components/dashboard/PrivacyCopilot';
-import { calculateGovernanceScores, ScoringInputData } from '@/utils/scoring-engine';
+import { calculateGovernanceScores, ScoringInputData, getMaturityTier } from '@/utils/scoring-engine';
+import { DataSyncProvider, useData } from '@/context/DataContext';
+import { useDataSync } from '@/hooks/use-datasync';
 
-export default function Dashboard() {
+function DashboardContent() {
+  const { state } = useData();
+  const { getTrend } = useDataSync();
+  const { vendors, vulnerabilities, dsars, activities, settings } = state;
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [isBooting, setIsBooting] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
 
-  // Simulated metrics for Algorithmic Scoring
+  // Next-Gen Dynamic metrics for Algorithmic Scoring
   const scoringData: ScoringInputData = {
-    vendors: { total: 5, hasDPA: 3, hasSecurity: 2 },
-    vulnerabilities: { total: 5, critical: 2, high: 1, mitigated: 1 },
-    dsars: { total: 4, onTime: 3 },
-    processes: { total: 15, complete: 10 }
+    vendors: { 
+      total: vendors.length, 
+      hasDPA: vendors.filter(v => v.hasDPA).length, 
+      hasSecurity: vendors.filter(v => v.hasISO || v.hasSOC2).length 
+    },
+    vulnerabilities: { 
+      total: vulnerabilities.length, 
+      bySeverity: {
+        'Crítico': vulnerabilities.filter(v => v.severity === 'Crítico' && v.status !== 'Mitigado').length,
+        'Alto': vulnerabilities.filter(v => v.severity === 'Alto' && v.status !== 'Mitigado').length,
+        'Médio': vulnerabilities.filter(v => v.severity === 'Médio' && v.status !== 'Mitigado').length,
+        'Baixo': vulnerabilities.filter(v => v.severity === 'Baixo' && v.status !== 'Mitigado').length,
+      },
+      mitigated: vulnerabilities.filter(v => v.status === 'Mitigado').length 
+    },
+    dsars: { 
+      total: dsars.length, 
+      onTime: dsars.filter(d => d.daysRemaining > 0 || d.status === 'Concluído').length 
+    },
+    processes: { 
+      total: activities.length, 
+      complete: activities.filter(a => a.status === 'Ativo').length 
+    },
+    weights: settings.criticalityWeights
   };
 
   const calculatedScores = calculateGovernanceScores(scoringData);
+  const globalScore = Math.round(calculatedScores.reduce((acc, curr) => acc + curr.A, 0) / calculatedScores.length);
+  const trend = getTrend();
+  const { tier, color } = getMaturityTier(globalScore);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -82,7 +110,17 @@ export default function Dashboard() {
               <div className="content-header">
                 <div className="greeting-section">
                   <h1 className="greeting-title">Olá, Fernando Melo</h1>
-                  <p className="greeting-subtitle">Sua organização está <span className="highlight">92% em conformidade</span> com a LGPD. 3 ações pendentes.</p>
+                  <div className="status-indicator">
+                    <span className="maturity-badge" style={{ backgroundColor: color }}>Nível: {tier}</span>
+                    <p className="greeting-subtitle">
+                      Sua organização está <span className="highlight">{globalScore}% em conformidade</span>. 
+                      {trend !== 0 && (
+                        <span className={`trend-pill ${trend > 0 ? 'up' : 'down'}`}>
+                          {trend > 0 ? '+' : ''}{trend}% vs snapshot
+                        </span>
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -136,7 +174,12 @@ export default function Dashboard() {
           )}
 
           {activeTab === 'forms' && <FormEngine />}
-          {activeTab === 'ripd' && <RIPDModule />}
+          {activeTab === 'ripd' && (
+            <RIPDModule 
+              navigateTo={navigateTo} 
+              onCopilotOpen={() => setIsCopilotOpen(true)} 
+            />
+          )}
           {activeTab === 'mapping' && <MappingModule navigateTo={navigateTo} selectedId={selectedFilter} />}
           {activeTab === 'vendor' && <VendorModule navigateTo={navigateTo} selectedId={selectedFilter} />}
           {activeTab === 'vulnerability' && (
@@ -151,11 +194,11 @@ export default function Dashboard() {
               onCopilotOpen={() => setIsCopilotOpen(true)} 
             />
           )}
-          {activeTab === 'legal-vault' && <LegalVaultModule />}
-          {activeTab === 'dsar' && <DSARModule />}
+          {activeTab === 'legal-vault' && <LegalVaultModule navigateTo={navigateTo} onCopilotOpen={() => setIsCopilotOpen(true)} />}
+          {activeTab === 'dsar' && <DSARModule navigateTo={navigateTo} onCopilotOpen={() => setIsCopilotOpen(true)} />}
 
           {/* Fallback for tabs not yet implemented */}
-          {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && activeTab !== 'vendor' && activeTab !== 'vulnerability' && activeTab !== 'incident' && activeTab !== 'legal-vault' && (
+          {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && activeTab !== 'vendor' && activeTab !== 'vulnerability' && activeTab !== 'incident' && activeTab !== 'legal-vault' && activeTab !== 'dsar' && (
             <div className="placeholder-view">
               <h2 className="greeting-title">Módulo em Desenvolvimento</h2>
               <p className="greeting-subtitle">O recurso de {activeTab} está sendo integrado à infraestrutura DataSync.</p>
@@ -163,6 +206,12 @@ export default function Dashboard() {
           )}
         </div>
       </main>
+
+      <PrivacyCopilot 
+        isOpen={isCopilotOpen} 
+        onClose={() => setIsCopilotOpen(false)} 
+      />
+      </div>
 
       <style jsx>{`
         .portal-container {
@@ -266,11 +315,10 @@ export default function Dashboard() {
           .greeting-subtitle { font-size: 0.8125rem; }
         }
       `}</style>
-        <PrivacyCopilot 
-          isOpen={isCopilotOpen} 
-          onClose={() => setIsCopilotOpen(false)} 
-        />
-      </div>
     </>
   );
+}
+
+export default function Dashboard() {
+  return <DashboardContent />;
 }

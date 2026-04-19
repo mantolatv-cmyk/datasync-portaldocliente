@@ -5,22 +5,25 @@ import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { ExternalLink } from 'lucide-react';
 
-const data = [
-  { name: 'Homologados', value: 42, color: '#00FF87' },
-  { name: 'Risco Pendente', value: 12, color: '#FB2E01' },
-  { name: 'Críticos', value: 5, color: '#FF0055' },
-];
-
-const assessments = [
-  { id: 1, name: 'Cloud Provider X', status: 'Homologado', date: '12 Abr 2026' },
-  { id: 2, name: 'SaaS Analytics', status: 'Em Revisão', date: '15 Abr 2026' },
-];
+import { useDataSync } from '@/hooks/use-datasync';
 
 interface VendorRiskWidgetProps {
   navigateTo: (tab: string, filter: string | null) => void;
 }
 
 export const VendorRiskWidget: React.FC<VendorRiskWidgetProps> = ({ navigateTo }) => {
+  const { vendors } = useDataSync();
+
+  const compliant = vendors.filter(v => v.status === 'Compliant').length;
+  const atRisk = vendors.filter(v => v.status === 'At Risk').length;
+  const audit = vendors.filter(v => v.status === 'Audit Required').length;
+
+  const chartData = [
+    { name: 'Homologados', value: compliant, color: '#00FF87' },
+    { name: 'Risco Pendente', value: atRisk, color: '#FB2E01' },
+    { name: 'Críticos', value: audit, color: '#FF0055' },
+  ];
+
   return (
     <Card 
       title="Risco de Terceiros" 
@@ -32,7 +35,7 @@ export const VendorRiskWidget: React.FC<VendorRiskWidgetProps> = ({ navigateTo }
           <ResponsiveContainer width="100%" height={180}>
             <PieChart>
               <Pie
-                data={data}
+                data={chartData}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
@@ -40,7 +43,7 @@ export const VendorRiskWidget: React.FC<VendorRiskWidgetProps> = ({ navigateTo }
                 paddingAngle={5}
                 dataKey="value"
               >
-                {data.map((entry, index) => (
+                {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -51,20 +54,20 @@ export const VendorRiskWidget: React.FC<VendorRiskWidgetProps> = ({ navigateTo }
             </PieChart>
           </ResponsiveContainer>
           <div className="chart-center">
-            <span className="total-value">59</span>
+            <span className="total-value">{vendors.length}</span>
             <span className="total-label">Total</span>
           </div>
         </div>
 
         <div className="assessment-list">
           <p className="section-title">Últimas Avaliações</p>
-          {assessments.map((item) => (
-            <div key={item.id} className="assessment-item">
+          {vendors.slice(0, 3).map((item) => (
+            <div key={item.id} className="assessment-item" onClick={() => navigateTo('vendor', item.id)}>
               <div className="item-info">
                 <p className="item-name">{item.name}</p>
-                <p className="item-date">{item.date}</p>
+                <p className="item-date">{item.lastAudit}</p>
               </div>
-              <Badge variant={item.status === 'Homologado' ? 'cyan' : 'amber'}>
+              <Badge variant={item.status === 'Compliant' ? 'cyan' : item.status === 'At Risk' ? 'crimson' : 'amber'}>
                 {item.status}
               </Badge>
               <button className="icon-link">

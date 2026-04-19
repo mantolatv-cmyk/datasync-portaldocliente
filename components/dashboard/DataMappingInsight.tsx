@@ -10,11 +10,18 @@ const trendData = [
   { value: 190 }, { value: 205 }, { value: 212 }, { value: 234 }
 ];
 
+import { useDataSync } from '@/hooks/use-datasync';
+
 interface DataMappingInsightProps {
   navigateTo: (tab: string, filter: string | null) => void;
 }
 
 export const DataMappingInsight: React.FC<DataMappingInsightProps> = ({ navigateTo }) => {
+  const { activities } = useDataSync();
+
+  const totalProcesses = activities.length;
+  const sensitiveAssets = activities.filter(a => a.isSensitive).length;
+
   return (
     <Card 
       title="Fluxo de Dados" 
@@ -30,8 +37,8 @@ export const DataMappingInsight: React.FC<DataMappingInsightProps> = ({ navigate
               <span>Processos Mapeados</span>
             </div>
             <div className="metric-body">
-              <span className="metric-value">142</span>
-              <span className="metric-trend positive">+8.2%</span>
+              <span className="metric-value">{totalProcesses}</span>
+              <span className="metric-trend positive">+{(totalProcesses * 0.1).toFixed(1)}%</span>
             </div>
           </div>
 
@@ -40,11 +47,11 @@ export const DataMappingInsight: React.FC<DataMappingInsightProps> = ({ navigate
           <div className="metric-item">
             <div className="metric-header">
               <Activity size={16} className="metric-icon" />
-              <span>Ativos Sensíveis</span>
+              <span>Processos Sensíveis</span>
             </div>
             <div className="metric-body">
-              <span className="metric-value">856</span>
-              <span className="metric-trend positive">+12.4%</span>
+              <span className="metric-value">{sensitiveAssets}</span>
+              <span className="metric-trend positive">+{(sensitiveAssets * 0.2).toFixed(1)}%</span>
             </div>
           </div>
         </div>

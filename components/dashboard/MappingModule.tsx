@@ -1,5 +1,7 @@
 'use client';
 import React, { useState } from 'react';
+import { useDataSync } from '@/hooks/use-datasync';
+import { ProcessingActivity } from '@/context/DataContext';
 import { 
   Database, 
   Search, 
@@ -18,19 +20,6 @@ import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { DataLineage } from './DataLineage';
 
-interface ProcessingActivity {
-  id: string;
-  name: string;
-  purpose: string;
-  categories: string[];
-  subjects: string;
-  legalBase: string;
-  isSensitive: boolean;
-  status: 'Ativo' | 'Em Revisão' | 'Arquivado';
-  department: 'RH' | 'TI' | 'Marketing' | 'Financeiro' | 'Jurídico';
-  vendorId?: string;
-  vendorName?: string;
-}
 
 interface MappingModuleProps {
   navigateTo: (tab: string, filter: string | null) => void;
@@ -38,74 +27,10 @@ interface MappingModuleProps {
 }
 
 export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, selectedId }) => {
+  const { activities, toggleActivityStatus } = useDataSync();
   const [viewMode, setViewMode] = useState<'table' | 'visual'>('table');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeDept, setActiveDept] = useState('Todos');
-
-  const [activities, setActivities] = useState<ProcessingActivity[]>([
-    { 
-      id: 'PROC-001', 
-      name: 'Gestão de Folha de Pagamento', 
-      purpose: 'Cumprimento de obrigações trabalhistas e pagamentos.', 
-      categories: ['Identificação', 'Financeiro', 'Saúde'], 
-      subjects: 'Colaboradores', 
-      legalBase: 'Cumprimento de Contrato / Obrigação Legal',
-      isSensitive: true,
-      status: 'Ativo',
-      department: 'RH',
-      vendorId: 'V-005',
-      vendorName: 'Soluções Contábeis'
-    },
-    { 
-      id: 'PROC-002', 
-      name: 'Marketing Direto & Newsletter', 
-      purpose: 'Envio de ofertas e comunicações institucionais.', 
-      categories: ['Nome', 'E-mail', 'Preferências'], 
-      subjects: 'Leads / Clientes', 
-      legalBase: 'Consentimento / Legítimo Interesse',
-      isSensitive: false,
-      status: 'Ativo',
-      department: 'Marketing',
-      vendorName: 'Interno'
-    },
-    { 
-      id: 'PROC-003', 
-      name: 'Plataforma de E-commerce', 
-      purpose: 'Processamento de vendas e entrega de produtos.', 
-      categories: ['Identificação', 'Endereço', 'Cartão'], 
-      subjects: 'Clientes', 
-      legalBase: 'Execução de Contrato',
-      isSensitive: false,
-      status: 'Em Revisão',
-      department: 'TI',
-      vendorId: 'V-001',
-      vendorName: 'AWS Brazil'
-    },
-    { 
-      id: 'PROC-004', 
-      name: 'Controle de Acesso Físico (Sede)', 
-      purpose: 'Segurança patrimonial e controle de entrada/saída.', 
-      categories: ['Biometria', 'Imagem (CFTV)'], 
-      subjects: 'Visitantes / Terceiros', 
-      legalBase: 'Prevenção à Fraude e Segurança do Titular',
-      isSensitive: true,
-      status: 'Ativo',
-      department: 'TI'
-    },
-    { 
-      id: 'PROC-005', 
-      name: 'Pesquisa de Clima Organizacional', 
-      purpose: 'Análise de satisfação interna e melhoria de processos.', 
-      categories: ['Opinião', 'Cargo', 'E-mail (Anonimizado)'], 
-      subjects: 'Colaboradores', 
-      legalBase: 'Legítimo Interesse',
-      isSensitive: false,
-      status: 'Arquivado',
-      department: 'RH'
-    },
-  ]);
-
-  const [selectedRequest, setSelectedRequest] = useState<ProcessingActivity | null>(null);
 
   const calculateHealth = (activity: ProcessingActivity) => {
     let score = 0;
@@ -114,17 +39,6 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
     if (activity.categories.length > 0) score += 20;
     if (activity.vendorName) score += 20;
     return score;
-  };
-
-  const toggleStatus = (id: string) => {
-    setActivities(prev => prev.map(a => {
-      if (a.id === id) {
-        const statuses: ProcessingActivity['status'][] = ['Ativo', 'Em Revisão', 'Arquivado'];
-        const nextIdx = (statuses.indexOf(a.status) + 1) % statuses.length;
-        return { ...a, status: statuses[nextIdx] };
-      }
-      return a;
-    }));
   };
 
   const filteredActivities = activities.filter(a => {
@@ -262,7 +176,7 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
                   </button>
                 </td>
                 <td>
-                  <div className="status-toggle-wrapper" onClick={() => toggleStatus(activity.id)}>
+                  <div className="status-toggle-wrapper" onClick={() => toggleActivityStatus(activity.id)}>
                     <Badge variant={activity.status === 'Ativo' ? 'emerald' : activity.status === 'Em Revisão' ? 'amber' : 'crimson'}>
                       {activity.status}
                     </Badge>

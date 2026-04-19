@@ -50,7 +50,7 @@ export const GovernanceScorecard: React.FC<GovernanceScorecardProps> = ({ data: 
           <button className="snapshot-btn" onClick={takeSnapshot} title="Gerar Snapshot Histórico">
             <Camera size={14} /> Snapshot
           </button>
-          <button className="export-btn">
+          <button className="export-btn" onClick={() => window.open('/report', '_blank')}>
             <Download size={14} /> Report
           </button>
         </div>

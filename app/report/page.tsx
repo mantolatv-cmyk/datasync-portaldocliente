@@ -296,7 +296,7 @@ export default function ReportPage() {
         .footer-meta .label { font-size: 0.625rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; }
         .footer-meta .val { font-size: 1rem; font-weight: 700; color: #0F172A; }
 
-        .section-page { margin-bottom: 100px; page-break-after: always; }
+        .section-page { margin-bottom: 60px; page-break-inside: avoid; }
         .section-heading { font-size: 1.75rem; font-weight: 900; color: #0F172A; margin-bottom: 16px; }
         .divider-gold { height: 6px; width: 80px; background: #0F172A; margin-bottom: 32px; }
         .body-text { font-size: 1.0625rem; line-height: 1.8; color: #334155; margin-bottom: 24px; }
@@ -340,7 +340,7 @@ export default function ReportPage() {
           .report-container { padding: 0 !important; background: white; }
           .report-paper { box-shadow: none !important; max-width: 100% !important; margin: 0 !important; padding: 80px !important; }
           .cover-page { height: 100vh !important; page-break-after: always; }
-          .section-page { page-break-before: always; padding-top: 60px; }
+          .section-page { padding-top: 40px; }
           .formula-box { background: #000 !important; color: #0f0 !important; -webkit-print-color-adjust: exact; }
           .conclusion { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact; }
         }

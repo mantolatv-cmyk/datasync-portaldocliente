@@ -33,7 +33,12 @@ interface DSARRequest {
   idVerified: boolean;
 }
 
-export const DSARModule: React.FC = () => {
+interface DSARModuleProps {
+  navigateTo?: (tab: string, filter: string | null) => void;
+  onCopilotOpen?: () => void;
+}
+
+export const DSARModule: React.FC<DSARModuleProps> = ({ navigateTo, onCopilotOpen }) => {
   const [selectedRequest, setSelectedRequest] = useState<DSARRequest | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [fulfillmentStep, setFulfillmentStep] = useState(1);

@@ -34,7 +34,12 @@ interface Incident {
   impactScore: number;
 }
 
-export const IncidentModule: React.FC = () => {
+interface IncidentModuleProps {
+  navigateTo?: (tab: string, filter: string | null) => void;
+  onCopilotOpen?: () => void;
+}
+
+export const IncidentModule: React.FC<IncidentModuleProps> = ({ navigateTo, onCopilotOpen }) => {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [terminalLogs, setTerminalLogs] = useState<string[]>(['[SYSTEM] Initializing Mission Control...', '[READY] Waiting for directives...']);

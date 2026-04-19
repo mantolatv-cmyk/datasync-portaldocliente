@@ -32,7 +32,12 @@ interface LegalDocument {
   aiSummary: string;
 }
 
-export const LegalVaultModule: React.FC = () => {
+interface LegalVaultModuleProps {
+  navigateTo?: (tab: string, filter: string | null) => void;
+  onCopilotOpen?: () => void;
+}
+
+export const LegalVaultModule: React.FC<LegalVaultModuleProps> = ({ navigateTo, onCopilotOpen }) => {
   const [selectedDoc, setSelectedDoc] = useState<LegalDocument | null>(null);
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');

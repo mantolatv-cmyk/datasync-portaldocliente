@@ -2,6 +2,7 @@
 import React from 'react';
 import { ShieldCheck, AlertCircle, Bell, Search, Menu, Sparkles } from 'lucide-react';
 import { Badge } from '../ui/Badge';
+import { NotificationCenter, Notification } from '../dashboard/NotificationCenter';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -9,6 +10,25 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, onCopilotClick }) => {
+  const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
+  const [notifications, setNotifications] = React.useState<Notification[]>([
+    { id: '1', type: 'incident', title: 'Incidente Crítico', message: 'Vulnerabilidade extrema detectada no banco de dados principal.', time: 'há 10 min', isRead: false },
+    { id: '2', type: 'dsar', title: 'Novo Pedido de Titular', message: 'Requisição REQ-082 de Exercício de Direito (Retificação).', time: 'há 1h', isRead: false },
+    { id: '3', type: 'vendor', title: 'Risco de Fornecedor', message: 'AWS Brazil: DPA pendente de assinatura renovada.', time: 'há 5h', isRead: true },
+    { id: '4', type: 'security', title: 'Monitoramento Ativo', message: 'Scan semanal concluído com 92% de conformidade.', time: 'há 1 dia', isRead: true },
+  ]);
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  const markRead = (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+  };
+
+  const clearAll = () => {
+    setNotifications([]);
+    setIsNotificationsOpen(false);
+  };
+
   return (
     <header className="header glass">
       <div className="header-left">
@@ -38,10 +58,24 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, onCopilotClick }) =
           <span className="spark-glow"></span>
         </button>
 
-        <button className="icon-button notification">
-          <Bell size={20} />
-          <span className="notification-dot"></span>
-        </button>
+        <div className="notification-wrapper">
+          <button 
+            className="icon-button notification" 
+            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+            title="Ver Notificações"
+          >
+            <Bell size={20} />
+            {unreadCount > 0 && <span className="notification-dot">{unreadCount > 9 ? '9+' : unreadCount}</span>}
+          </button>
+          
+          <NotificationCenter 
+            isOpen={isNotificationsOpen}
+            onClose={() => setIsNotificationsOpen(false)}
+            notifications={notifications}
+            onMarkRead={markRead}
+            onClearAll={clearAll}
+          />
+        </div>
 
         <button className="cta-button">
           <AlertCircle size={18} />
@@ -155,15 +189,30 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, onCopilotClick }) =
           color: var(--foreground);
         }
 
+        .notification-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
         .notification-dot {
           position: absolute;
-          top: -2px;
-          right: -2px;
-          width: 8px;
-          height: 8px;
+          top: -6px;
+          right: -6px;
+          min-width: 14px;
+          height: 14px;
           background: var(--error);
-          border-radius: 50%;
-          border: 2px solid var(--background);
+          border-radius: 7px;
+          border: 1.5px solid var(--background);
+          color: #FFF;
+          font-size: 0.5rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 4px;
+          box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
         }
 
         .cta-button {

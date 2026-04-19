@@ -105,6 +105,8 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
     },
   ]);
 
+  const [selectedRequest, setSelectedRequest] = useState<ProcessingActivity | null>(null);
+
   const calculateHealth = (activity: ProcessingActivity) => {
     let score = 0;
     if (activity.legalBase) score += 40;
@@ -130,8 +132,6 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
     const matchesDept = activeDept === 'Todos' || a.department === activeDept;
     return matchesSearch && matchesDept;
   });
-des(searchTerm.toLowerCase())
-  );
 
   if (viewMode === 'visual') {
     return (
@@ -160,16 +160,19 @@ des(searchTerm.toLowerCase())
       <div className="module-header">
         <div className="header-info">
           <h2 className="header-title">Mapeamento de Dados (RoPA)</h2>
-      <div className="dept-ribbon">
-        {['Todos', 'RH', 'TI', 'Marketing', 'Financeiro', 'Jurídico'].map(dept => (
-          <button 
-            key={dept} 
-            className={`dept-tab ${activeDept === dept ? 'active' : ''}`}
-            onClick={() => setActiveDept(dept)}
-          >
-            {dept}
-          </button>
-        ))}
+          <p className="header-subtitle">Registro de Operações de Tratamento de Dados Pessoais - Art. 37 LGPD</p>
+        </div>
+        <div className="dept-ribbon">
+          {['Todos', 'RH', 'TI', 'Marketing', 'Financeiro', 'Jurídico'].map(dept => (
+            <button 
+              key={dept} 
+              className={`dept-tab ${activeDept === dept ? 'active' : ''}`}
+              onClick={() => setActiveDept(dept)}
+            >
+              {dept}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="action-bar">

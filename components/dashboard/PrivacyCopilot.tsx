@@ -48,7 +48,10 @@ export const PrivacyCopilot: React.FC<PrivacyCopilotProps> = ({ isOpen, onClose 
   const suggestions = [
     "Qual meu maior risco de fornecedor?",
     "Resuma meus pedidos de titulares",
-    "Quantos ativos têm dados sensíveis?"
+    "Quantos ativos têm dados sensíveis?",
+    "Quais dados são compartilhados internacionalmente?",
+    "Status dos processos em revisão (RoPA)",
+    "Existem vulnerabilidades de alto risco?"
   ];
 
   const handleSend = (text: string = input) => {
@@ -70,7 +73,13 @@ export const PrivacyCopilot: React.FC<PrivacyCopilotProps> = ({ isOpen, onClose 
       let reply = "Desculpe, ainda estou processando essa informação. Poderia ser mais específico?";
       const lowerText = text.toLowerCase();
 
-      if (lowerText.includes('risco') || lowerText.includes('fornecedor')) {
+      if (lowerText.includes('vulnerabilidade')) {
+        reply = "O monitor de segurança detectou 1 vulnerabilidade de criticidade EXTREMA no servidor de banco de dados. Recomendo acionar o Kill-Switch no Command Center imediatamente.";
+      } else if (lowerText.includes('internacional')) {
+        reply = "Identifiquei transferências internacionais para 'AWS Brazil' (EUA) e 'Salesforce' (EUA). Ambos possuem cláusulas contratuais padrão (SCCs) mapeadas no Vault Jurídico.";
+      } else if (lowerText.includes('revisão') || lowerText.includes('ropa')) {
+        reply = "No momento, o processo 'Plataforma de E-commerce' (TI) está em revisão. A Saúde de Conformidade está em 70% devido à falta de definição precisa do descarte de dados.";
+      } else if (lowerText.includes('risco') || lowerText.includes('fornecedor')) {
         reply = "Analisando seu Vendor Risk... O fornecedor 'AWS Brazil' está em revisão devido à falta de certificação SOC2. Recomendo verificar o Vault Jurídico para o aditivo de DPA.";
       } else if (lowerText.includes('titular') || lowerText.includes('pedido') || lowerText.includes('sla')) {
         reply = "Você tem 12 pedidos de titulares ativos. 3 deles ('REQ-082', 'REQ-079') estão com SLA crítico (menos de 2 dias). Já verifiquei a identidade de 94% dos solicitantes.";

@@ -23,6 +23,7 @@ import { PrivacyCopilot } from '@/components/dashboard/PrivacyCopilot';
 import { calculateGovernanceScores, ScoringInputData, getMaturityTier } from '@/utils/scoring-engine';
 import { DataSyncProvider, useData } from '@/context/DataContext';
 import { useDataSync } from '@/hooks/use-datasync';
+import { Award, ArrowUp, ArrowDown } from 'lucide-react';
 
 function DashboardContent() {
   const { state } = useData();
@@ -111,7 +112,14 @@ function DashboardContent() {
                 <div className="greeting-section">
                   <h1 className="greeting-title">Olá, Fernando Melo</h1>
                   <div className="status-indicator">
-                    <span className="maturity-badge" style={{ backgroundColor: color }}>Nível: {tier}</span>
+                    <span className="maturity-badge" style={{ 
+                      backgroundColor: `rgba(${color.includes('var') ? '0, 255, 135' : '251, 165, 2'}, 0.1)`, 
+                      color: color,
+                      borderColor: `rgba(${color.includes('var') ? '0, 255, 135' : '251, 165, 2'}, 0.3)`
+                    }}>
+                      <Award size={12} />
+                      Nível: {tier}
+                    </span>
                     <p className="greeting-subtitle">
                       Sua organização está <span className="highlight">{globalScore}% em conformidade</span>. 
                       {trend !== 0 && (
@@ -241,21 +249,60 @@ function DashboardContent() {
         }
 
         .greeting-title {
-          font-size: 2rem;
-          margin-bottom: 8px;
-          background: linear-gradient(135deg, #F8FAFC 0%, #94A3B8 100%);
+          font-size: 2.5rem;
+          font-weight: 900;
+          margin-bottom: 4px;
+          background: linear-gradient(135deg, #FFF 0%, #94A3B8 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
+          letter-spacing: -0.02em;
         }
+
+        .status-indicator {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+
+        .maturity-badge { 
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.6875rem; 
+          font-weight: 800; 
+          padding: 6px 16px; 
+          border-radius: 99px; 
+          border: 1px solid transparent;
+          backdrop-filter: blur(12px);
+          text-transform: uppercase; 
+          letter-spacing: 0.08em;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+          transition: all 0.3s ease;
+        }
+
+        .trend-pill { 
+          font-size: 0.75rem; 
+          font-weight: 700; 
+          padding: 4px 10px; 
+          border-radius: 6px; 
+        }
+
+        .trend-pill.up { background: rgba(0, 255, 135, 0.1); color: var(--accent); border: 1px solid rgba(0, 255, 135, 0.15); }
+        .trend-pill.down { background: rgba(255, 71, 87, 0.1); color: var(--error); border: 1px solid rgba(255, 71, 87, 0.15); }
 
         .greeting-subtitle {
           color: var(--secondary);
-          font-size: 1.125rem;
+          font-size: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          opacity: 0.9;
         }
 
         .highlight {
           color: var(--accent);
-          font-weight: 600;
+          font-weight: 700;
         }
 
         .dashboard-grid {

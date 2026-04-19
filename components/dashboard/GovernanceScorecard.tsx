@@ -106,7 +106,14 @@ export const GovernanceScorecard: React.FC<GovernanceScorecardProps> = ({ data: 
               </div>
             </div>
             <div>
-              <div className="tier-badge" style={{ backgroundColor: color }}>Nível: {tier}</div>
+              <div className="tier-badge" style={{ 
+                backgroundColor: `rgba(${color.includes('var') ? '0, 255, 135' : '251, 165, 2'}, 0.1)`, 
+                color: color,
+                borderColor: `rgba(${color.includes('var') ? '0, 255, 135' : '251, 165, 2'}, 0.3)`
+              }}>
+                <Award size={12} />
+                Nível: {tier}
+              </div>
               <div className="trend-indicator">
                 {trend !== 0 ? (
                   <div className={`trend-val ${trend > 0 ? 'up' : 'down'}`}>
@@ -223,13 +230,19 @@ export const GovernanceScorecard: React.FC<GovernanceScorecardProps> = ({ data: 
         .circle { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dasharray 0.8s ease; }
 
         .tier-badge {
-          font-size: 0.625rem;
-          font-weight: 800;
-          padding: 4px 8px;
-          border-radius: 4px;
-          color: #000;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 14px;
+          border-radius: 99px;
+          font-size: 0.6875rem;
+          font-weight: 700;
           text-transform: uppercase;
-          margin-bottom: 4px;
+          letter-spacing: 0.05em;
+          margin-bottom: 8px;
+          border: 1px solid transparent;
+          backdrop-filter: blur(12px);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .trend-indicator {

@@ -128,8 +128,18 @@ export default function Dashboard() {
           {activeTab === 'ripd' && <RIPDModule />}
           {activeTab === 'mapping' && <MappingModule navigateTo={navigateTo} selectedId={selectedFilter} />}
           {activeTab === 'vendor' && <VendorModule navigateTo={navigateTo} selectedId={selectedFilter} />}
-          {activeTab === 'vulnerability' && <VulnerabilityModule />}
-          {activeTab === 'incident' && <IncidentModule />}
+          {activeTab === 'vulnerability' && (
+            <VulnerabilityModule 
+              navigateTo={navigateTo} 
+              onCopilotOpen={() => setIsCopilotOpen(true)} 
+            />
+          )}
+          {activeTab === 'incident' && (
+            <IncidentModule 
+              navigateTo={navigateTo} 
+              onCopilotOpen={() => setIsCopilotOpen(true)} 
+            />
+          )}
           {activeTab === 'legal-vault' && <LegalVaultModule />}
           {activeTab === 'dsar' && <DSARModule />}
 

@@ -27,6 +27,7 @@ interface ProcessingActivity {
   legalBase: string;
   isSensitive: boolean;
   status: 'Ativo' | 'Em Revisão' | 'Arquivado';
+  department: 'RH' | 'TI' | 'Marketing' | 'Financeiro' | 'Jurídico';
   vendorId?: string;
   vendorName?: string;
 }
@@ -39,8 +40,9 @@ interface MappingModuleProps {
 export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, selectedId }) => {
   const [viewMode, setViewMode] = useState<'table' | 'visual'>('table');
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeDept, setActiveDept] = useState('Todos');
 
-  const activities: ProcessingActivity[] = [
+  const [activities, setActivities] = useState<ProcessingActivity[]>([
     { 
       id: 'PROC-001', 
       name: 'Gestão de Folha de Pagamento', 
@@ -50,6 +52,7 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
       legalBase: 'Cumprimento de Contrato / Obrigação Legal',
       isSensitive: true,
       status: 'Ativo',
+      department: 'RH',
       vendorId: 'V-005',
       vendorName: 'Soluções Contábeis'
     },
@@ -62,6 +65,7 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
       legalBase: 'Consentimento / Legítimo Interesse',
       isSensitive: false,
       status: 'Ativo',
+      department: 'Marketing',
       vendorName: 'Interno'
     },
     { 
@@ -73,6 +77,7 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
       legalBase: 'Execução de Contrato',
       isSensitive: false,
       status: 'Em Revisão',
+      department: 'TI',
       vendorId: 'V-001',
       vendorName: 'AWS Brazil'
     },
@@ -84,7 +89,8 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
       subjects: 'Visitantes / Terceiros', 
       legalBase: 'Prevenção à Fraude e Segurança do Titular',
       isSensitive: true,
-      status: 'Ativo'
+      status: 'Ativo',
+      department: 'TI'
     },
     { 
       id: 'PROC-005', 
@@ -94,13 +100,37 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
       subjects: 'Colaboradores', 
       legalBase: 'Legítimo Interesse',
       isSensitive: false,
-      status: 'Arquivado'
+      status: 'Arquivado',
+      department: 'RH'
     },
-  ];
+  ]);
 
-  const filteredActivities = activities.filter(a => 
-    a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.id.toLowerCase().includes(searchTerm.toLowerCase())
+  const calculateHealth = (activity: ProcessingActivity) => {
+    let score = 0;
+    if (activity.legalBase) score += 40;
+    if (activity.purpose) score += 20;
+    if (activity.categories.length > 0) score += 20;
+    if (activity.vendorName) score += 20;
+    return score;
+  };
+
+  const toggleStatus = (id: string) => {
+    setActivities(prev => prev.map(a => {
+      if (a.id === id) {
+        const statuses: ProcessingActivity['status'][] = ['Ativo', 'Em Revisão', 'Arquivado'];
+        const nextIdx = (statuses.indexOf(a.status) + 1) % statuses.length;
+        return { ...a, status: statuses[nextIdx] };
+      }
+      return a;
+    }));
+  };
+
+  const filteredActivities = activities.filter(a => {
+    const matchesSearch = a.name.toLowerCase().includes(searchTerm.toLowerCase()) || a.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDept = activeDept === 'Todos' || a.department === activeDept;
+    return matchesSearch && matchesDept;
+  });
+des(searchTerm.toLowerCase())
   );
 
   if (viewMode === 'visual') {
@@ -130,16 +160,16 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
       <div className="module-header">
         <div className="header-info">
           <h2 className="header-title">Mapeamento de Dados (RoPA)</h2>
-          <p className="header-subtitle">Registro de Operações de Tratamento de Dados Pessoais - Art. 37 LGPD</p>
-        </div>
-        <div className="switcher-group">
-          <button className="switch-btn active">
-            <TableIcon size={16} /> Ver Tabela
+      <div className="dept-ribbon">
+        {['Todos', 'RH', 'TI', 'Marketing', 'Financeiro', 'Jurídico'].map(dept => (
+          <button 
+            key={dept} 
+            className={`dept-tab ${activeDept === dept ? 'active' : ''}`}
+            onClick={() => setActiveDept(dept)}
+          >
+            {dept}
           </button>
-          <button className="switch-btn" onClick={() => setViewMode('visual')}>
-            <Network size={16} /> Mapa Visual
-          </button>
-        </div>
+        ))}
       </div>
 
       <div className="action-bar">
@@ -153,8 +183,7 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
           />
         </div>
         <div className="action-buttons">
-          <button className="btn secondary"><Filter size={18} /> Filtros</button>
-          <button className="btn secondary"><Download size={18} /> Exportar CSV</button>
+          <button className="btn secondary"><Download size={18} /> Exportar RoPA</button>
           <button className="btn primary"><Plus size={18} /> Novo Mapeamento</button>
         </div>
       </div>
@@ -164,11 +193,11 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
           <thead>
             <tr>
               <th>CÓDIGO</th>
+              <th>SAÚDE</th>
               <th>ATIVIDADE DE TRATAMENTO</th>
               <th>CATEGORIAS</th>
-              <th>TITULARES</th>
               <th>BASE LEGAL</th>
-              <th>OPERADOR / FORNECEDOR</th>
+              <th>OPERADOR</th>
               <th>STATUS</th>
               <th></th>
             </tr>
@@ -181,10 +210,21 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
               >
                 <td className="font-mono text-secondary">{activity.id}</td>
                 <td>
+                  <div className="health-cell">
+                    <div className="health-gauge">
+                      <div 
+                        className={`health-fill ${calculateHealth(activity) < 50 ? 'critical' : calculateHealth(activity) < 80 ? 'warning' : 'success'}`}
+                        style={{ width: `${calculateHealth(activity)}%` }}
+                      ></div>
+                    </div>
+                    <span className="health-value">{calculateHealth(activity)}%</span>
+                  </div>
+                </td>
+                <td>
                   <div className="activity-cell">
                     <div className="name-wrapper">
                       <span className="activity-name">{activity.name}</span>
-                      <span className="activity-purpose">{activity.purpose}</span>
+                      <span className="activity-purpose">{activity.department} • {activity.subjects}</span>
                     </div>
                     {activity.isSensitive && (
                       <div className="sensitive-indicator" title="Contém Dados Sensíveis">
@@ -198,12 +238,6 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
                     {activity.categories.map(cat => (
                       <span key={cat} className="category-tag">{cat}</span>
                     ))}
-                  </div>
-                </td>
-                <td>
-                  <div className="subject-cell">
-                    <Users size={14} className="text-secondary" />
-                    <span>{activity.subjects}</span>
                   </div>
                 </td>
                 <td>
@@ -225,9 +259,11 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
                   </button>
                 </td>
                 <td>
-                  <Badge variant={activity.status === 'Ativo' ? 'emerald' : activity.status === 'Em Revisão' ? 'amber' : 'crimson'}>
-                    {activity.status}
-                  </Badge>
+                  <div className="status-toggle-wrapper" onClick={() => toggleStatus(activity.id)}>
+                    <Badge variant={activity.status === 'Ativo' ? 'emerald' : activity.status === 'Em Revisão' ? 'amber' : 'crimson'}>
+                      {activity.status}
+                    </Badge>
+                  </div>
                 </td>
                 <td>
                   <div className="row-actions">
@@ -243,6 +279,69 @@ export const MappingModule: React.FC<MappingModuleProps> = ({ navigateTo, select
       </div>
 
       <style jsx>{`
+        .dept-ribbon {
+          display: flex;
+          gap: 8px;
+          background: rgba(255, 255, 255, 0.02);
+          padding: 6px;
+          border-radius: 12px;
+          border: 1px solid var(--border);
+          width: fit-content;
+        }
+
+        .dept-tab {
+          padding: 6px 16px;
+          border-radius: 8px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: var(--secondary);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .dept-tab:hover { color: #FFF; }
+        .dept-tab.active { background: var(--accent); color: #000; box-shadow: 0 2px 10px rgba(0, 255, 135, 0.2); }
+
+        .health-cell {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          width: 80px;
+        }
+
+        .health-gauge {
+          height: 6px;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 3px;
+          overflow: hidden;
+        }
+
+        .health-fill {
+          height: 100%;
+          border-radius: 3px;
+          transition: width 0.5s ease-out;
+        }
+
+        .health-fill.success { background: var(--accent); }
+        .health-fill.warning { background: var(--warning); }
+        .health-fill.critical { background: var(--error); }
+
+        .health-value {
+          font-size: 0.6875rem;
+          font-weight: 800;
+          color: var(--secondary);
+          font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-toggle-wrapper {
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+
+        .status-toggle-wrapper:active { transform: scale(0.95); }
+
         .module-container {
           padding: 32px 40px;
           display: flex;

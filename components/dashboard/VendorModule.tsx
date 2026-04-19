@@ -24,6 +24,10 @@ interface Vendor {
   sensitiveActivities: number;
   lastAudit: string;
   status: 'Compliant' | 'At Risk' | 'Audit Required';
+  hasDPA: boolean;
+  hasISO: boolean;
+  hasSOC2: boolean;
+  contactEmail: string;
 }
 
 interface VendorModuleProps {
@@ -35,28 +39,46 @@ export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selected
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const vendors: Vendor[] = [
-    { id: 'V-001', name: 'AWS Brazil', category: 'Cloud Infrastructure', mappedActivities: 8, sensitiveActivities: 3, lastAudit: '10/01/2024', status: 'Compliant' },
-    { id: 'V-002', name: 'Salesforce (SaaS)', category: 'CRM', mappedActivities: 4, sensitiveActivities: 1, lastAudit: '15/12/2023', status: 'Compliant' },
-    { id: 'V-003', name: 'Zendesk Inc.', category: 'Customer Support', mappedActivities: 2, sensitiveActivities: 0, lastAudit: '05/02/2024', status: 'Compliant' },
-    { id: 'V-004', name: 'Loggi Tecnologia', category: 'Logistics / Delivery', mappedActivities: 3, sensitiveActivities: 2, lastAudit: '20/03/2024', status: 'At Risk' },
-    { id: 'V-005', name: 'Soluções Contábeis LTDA', category: 'Accounting / Payroll', mappedActivities: 1, sensitiveActivities: 1, lastAudit: '02/11/2023', status: 'Audit Required' },
-  ];
+  const [vendors, setVendors] = useState<Vendor[]>([
+    { id: 'V-001', name: 'AWS Brazil', category: 'Cloud Infrastructure', mappedActivities: 8, sensitiveActivities: 3, lastAudit: '10/01/2024', status: 'Compliant', hasDPA: true, hasISO: true, hasSOC2: true, contactEmail: 'compliance@amazon.com' },
+    { id: 'V-002', name: 'Salesforce (SaaS)', category: 'CRM', mappedActivities: 4, sensitiveActivities: 1, lastAudit: '15/12/2023', status: 'Compliant', hasDPA: true, hasISO: true, hasSOC2: false, contactEmail: 'privacy@salesforce.com' },
+    { id: 'V-003', name: 'Zendesk Inc.', category: 'Customer Support', mappedActivities: 2, sensitiveActivities: 0, lastAudit: '05/02/2024', status: 'Compliant', hasDPA: true, hasISO: false, hasSOC2: false, contactEmail: 'dpo@zendesk.com' },
+    { id: 'V-004', name: 'Loggi Tecnologia', category: 'Logistics / Delivery', mappedActivities: 3, sensitiveActivities: 2, lastAudit: '20/03/2024', status: 'At Risk', hasDPA: false, hasISO: false, hasSOC2: false, contactEmail: 'privacidade@loggi.com.br' },
+    { id: 'V-005', name: 'Soluções Contábeis LTDA', category: 'Accounting / Payroll', mappedActivities: 1, sensitiveActivities: 1, lastAudit: '02/11/2023', status: 'Audit Required', hasDPA: true, hasISO: false, hasSOC2: false, contactEmail: 'contato@contabil.com.br' },
+  ]);
+
+  const toggleStatus = (id: string) => {
+    setVendors(prev => prev.map(v => {
+      if (v.id === id) {
+        const statuses: Vendor['status'][] = ['Compliant', 'At Risk', 'Audit Required'];
+        const nextIdx = (statuses.indexOf(v.status) + 1) % statuses.length;
+        return { ...v, status: statuses[nextIdx] };
+      }
+      return v;
+    }));
+  };
+
+  const calculateRiskScore = (vendor: Vendor) => {
+    let score = 0;
+    // Missing DPA is high risk (40 points)
+    if (!vendor.hasDPA) score += 40;
+    // Missing security certifications (30 points each)
+    if (!vendor.hasISO) score += 30;
+    if (!vendor.hasSOC2) score += 30;
+    
+    // Impact weight based on sensitivity
+    if (vendor.sensitiveActivities > 0) score += 10;
+    
+    return Math.min(score, 100);
+  };
 
   const filteredVendors = vendors.filter(v => 
     v.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const calculateRiskScore = (vendor: Vendor) => {
-    // Logic: More sensitive activities = higher risk score
-    // Compliant status reduces visual risk weight
-    const score = (vendor.sensitiveActivities * 25) + (vendor.mappedActivities * 5);
-    return Math.min(score, 100);
-  };
-
   const getRiskLevel = (score: number) => {
-    if (score > 70) return { label: 'Crítico', color: 'crimson' };
-    if (score > 40) return { label: 'Médio', color: 'amber' };
+    if (score >= 70) return { label: 'Crítico', color: 'crimson' };
+    if (score >= 30) return { label: 'Médio', color: 'amber' };
     return { label: 'Baixo', color: 'emerald' };
   };
 
@@ -84,12 +106,12 @@ export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selected
         </div>
         <div className="summary-stats">
           <div className="stat-card">
-            <span className="val">22</span>
+            <span className="val">{vendors.length}</span>
             <span className="lab">Vendores</span>
           </div>
           <div className="stat-card">
-            <span className="val text-error">3</span>
-            <span className="lab">Em Risco</span>
+            <span className="val text-error">{vendors.filter(v => v.status !== 'Compliant').length}</span>
+            <span className="lab">Em Alerta</span>
           </div>
         </div>
       </div>
@@ -100,10 +122,10 @@ export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selected
             <tr>
               <th>FORNECEDOR / PARCEIRO</th>
               <th>CATEGORIA</th>
-              <th>PROCESSOS VINCULADOS</th>
-              <th>SCORE DE RISCO (IA)</th>
-              <th>STATUS AUDITORIA</th>
-              <th>ÚLTIMA REV.</th>
+              <th>PROCESSOS</th>
+              <th>AUDIT DOCS</th>
+              <th>RISCO (TPRM)</th>
+              <th>STATUS</th>
               <th></th>
             </tr>
           </thead>
@@ -139,6 +161,18 @@ export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selected
                     </div>
                   </td>
                   <td>
+                    <div className="audit-docs-cell">
+                      <div className={`doc-tag ${vendor.hasDPA ? 'check' : 'missing'}`} title={vendor.hasDPA ? 'DPA Assinado' : 'DPA Pendente'}>
+                        <FileCheck size={14} />
+                        <span>DPA</span>
+                      </div>
+                      <div className={`doc-tag ${vendor.hasISO || vendor.hasSOC2 ? 'check' : 'warn'}`} title="Certificações de Segurança">
+                        <ShieldCheck size={14} />
+                        <span>SEC</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
                     <div className="risk-indicator">
                       <div className="progress-bar">
                         <div className={`progress-fill bg-${risk.color}`} style={{ width: `${score}%` }}></div>
@@ -147,11 +181,12 @@ export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selected
                     </div>
                   </td>
                   <td>
-                    <Badge variant={vendor.status === 'Compliant' ? 'emerald' : vendor.status === 'At Risk' ? 'crimson' : 'amber'}>
-                      {vendor.status}
-                    </Badge>
+                    <div className="status-toggle-wrapper" onClick={(e) => { e.stopPropagation(); toggleStatus(vendor.id); }}>
+                      <Badge variant={vendor.status === 'Compliant' ? 'emerald' : vendor.status === 'At Risk' ? 'crimson' : 'amber'}>
+                        {vendor.status}
+                      </Badge>
+                    </div>
                   </td>
-                  <td className="text-secondary">{vendor.lastAudit}</td>
                   <td>
                     <button className="view-btn">
                       <ArrowRight size={18} />
@@ -183,21 +218,27 @@ export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selected
             <div className="audit-sections">
               <div className="audit-section">
                 <h5 className="section-title">CHECKLIST DE CONFORMIDADE</h5>
-                <div className="checklist-item done">
+                <div className={`checklist-item ${selectedVendor.hasDPA ? 'done' : 'warn'}`}>
                   <FileCheck size={16} />
-                  <span>Políticas de Privacidade Atualizadas</span>
+                  <span>DPA (Data Processing Agreement) {selectedVendor.hasDPA ? 'Assinado' : 'Pendente'}</span>
                 </div>
-                <div className="checklist-item done">
-                  <FileCheck size={16} />
-                  <span>DPA (Data Processing Agreement) Assinado</span>
+                <div className={`checklist-item ${selectedVendor.hasISO ? 'done' : 'warn'}`}>
+                  <ShieldCheck size={16} />
+                  <span>Certificação ISO 27001 {selectedVendor.hasISO ? 'Válida' : 'Pendente/Expirada'}</span>
                 </div>
-                <div className="checklist-item pending">
-                  <AlertCircle size={16} />
-                  <span>Certificação ISO 27001 / SOC2</span>
+                <div className={`checklist-item ${selectedVendor.hasSOC2 ? 'done' : 'pending'}`}>
+                  <ShieldCheck size={16} />
+                  <span>Relatórios SOC2 Type II {selectedVendor.hasSOC2 ? 'Recebidos' : 'Em Solicitação'}</span>
                 </div>
-                <div className="checklist-item warn">
-                  <AlertCircle size={16} />
-                  <span>Mapeamento de Sub-operadores</span>
+              </div>
+
+              <div className="audit-section">
+                <div className="contact-card glass">
+                  <span className="contact-label">CONTATO DE PRIVACIDADE / DPO</span>
+                  <span className="contact-email">{selectedVendor.contactEmail}</span>
+                  <a href={`mailto:${selectedVendor.contactEmail}`} className="contact-btn">
+                    Contatar Equipe de Privacidade
+                  </a>
                 </div>
               </div>
 
@@ -229,6 +270,61 @@ export const VendorModule: React.FC<VendorModuleProps> = ({ navigateTo, selected
       </SideSheet>
 
       <style jsx>{`
+        .audit-docs-cell {
+          display: flex;
+          gap: 8px;
+        }
+
+        .doc-tag {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 0.625rem;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+
+        .doc-tag.check { background: rgba(0, 255, 135, 0.1); color: var(--accent); border: 1px solid rgba(0, 255, 135, 0.2); }
+        .doc-tag.missing { background: rgba(255, 71, 87, 0.1); color: #FF4757; border: 1px solid rgba(255, 71, 87, 0.2); }
+        .doc-tag.warn { background: rgba(255, 165, 2, 0.1); color: #FFA502; border: 1px solid rgba(255, 165, 2, 0.2); }
+
+        .status-toggle-wrapper {
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+
+        .status-toggle-wrapper:active { transform: scale(0.95); }
+
+        .contact-card {
+          padding: 20px;
+          border-radius: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          border: 1px solid var(--border);
+        }
+
+        .contact-label { font-size: 0.625rem; font-weight: 800; color: var(--secondary); }
+        .contact-email { font-size: 0.9375rem; font-weight: 700; color: #FFF; }
+
+        .contact-btn {
+          display: block;
+          text-align: center;
+          padding: 10px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          color: var(--foreground);
+          font-size: 0.8125rem;
+          font-weight: 600;
+          text-decoration: none;
+          transition: all 0.2s;
+        }
+
+        .contact-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
         .module-container {
           padding: 32px 40px;
           display: flex;

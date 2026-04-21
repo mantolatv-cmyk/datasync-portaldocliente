@@ -90,136 +90,139 @@ function DashboardContent() {
 
   return (
     <>
-      {isBooting && <Preloader />}
-      <div className="portal-container">
-        <Sidebar 
-          activeTab={activeTab} 
-          setActiveTab={handleTabChange} 
-          isOpen={isSidebarOpen} 
-          onClose={() => setIsSidebarOpen(false)} 
-        />
-      
-      <main className="main-viewport">
-        <Header 
-          onMenuClick={() => setIsSidebarOpen(true)} 
-          onCopilotClick={() => setIsCopilotOpen(true)}
-        />
+      {isBooting ? (
+        <Preloader />
+      ) : (
+        <div className="portal-container anim-fade-in">
+          <Sidebar 
+            activeTab={activeTab} 
+            setActiveTab={handleTabChange} 
+            isOpen={isSidebarOpen} 
+            onClose={() => setIsSidebarOpen(false)} 
+          />
         
-        <div className="content-scroll">
-          {activeTab === 'overview' && (
-            <>
-              <div className="content-header">
-                <div className="greeting-section">
-                  <h1 className="greeting-title">Olá, Fernando Melo</h1>
-                  <div className="status-indicator">
-                    <span className="maturity-badge" style={{ 
-                      backgroundColor: `rgba(${color.includes('var') ? '0, 255, 135' : '251, 165, 2'}, 0.1)`, 
-                      color: color,
-                      borderColor: `rgba(${color.includes('var') ? '0, 255, 135' : '251, 165, 2'}, 0.3)`
-                    }}>
-                      <Award size={12} />
-                      Nível: {tier}
-                    </span>
-                    <p className="greeting-subtitle">
-                      Sua organização está <span className="highlight">{globalScore}% em conformidade</span>. 
-                      {trend !== 0 && (
-                        <span className={`trend-pill ${trend > 0 ? 'up' : 'down'}`}>
-                          {trend > 0 ? '+' : ''}{trend}% vs snapshot
+          <main className="main-viewport">
+            <Header 
+              onMenuClick={() => setIsSidebarOpen(true)} 
+              onCopilotClick={() => setIsCopilotOpen(true)}
+            />
+            
+            <div className="content-scroll">
+              {activeTab === 'overview' && (
+                <>
+                  <div className="content-header">
+                    <div className="greeting-section">
+                      <h1 className="greeting-title">Olá, Fernando Melo</h1>
+                      <div className="status-indicator">
+                        <span className="maturity-badge" style={{ 
+                          backgroundColor: `rgba(${color.includes('var') ? '0, 255, 135' : '251, 165, 2'}, 0.1)`, 
+                          color: color,
+                          borderColor: `rgba(${color.includes('var') ? '0, 255, 135' : '251, 165, 2'}, 0.3)`
+                        }}>
+                          <Award size={12} />
+                          Nível: {tier}
                         </span>
-                      )}
-                    </p>
+                        <p className="greeting-subtitle">
+                          Sua organização está <span className="highlight">{globalScore}% em conformidade</span>. 
+                          {trend !== 0 && (
+                            <span className={`trend-pill ${trend > 0 ? 'up' : 'down'}`}>
+                              {trend > 0 ? '+' : ''}{trend}% vs snapshot
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
                   </div>
+
+                  <div className="dashboard-grid">
+                    <div className="grid-main">
+                      <div className="bento-row">
+                        <div className="bento-col-12">
+                          <EDiscoveryTool />
+                        </div>
+                      </div>
+
+                      <div className="bento-row">
+                        <div className="bento-col-12">
+                          <AIRIPDGenerator />
+                        </div>
+                      </div>
+
+                      <div className="bento-row">
+                        <div className="bento-col-8">
+                          <DataMappingInsight navigateTo={navigateTo} />
+                        </div>
+                        <div className="bento-col-4">
+                          <VulnerabilitySummary navigateTo={navigateTo} />
+                        </div>
+                      </div>
+
+                      <div className="bento-row">
+                        <div className="bento-col-12">
+                          <GovernanceScorecard data={calculatedScores} />
+                        </div>
+                      </div>
+
+                      <div className="bento-row">
+                        <div className="bento-col-12">
+                          <DataLineage />
+                        </div>
+                      </div>
+                      
+                      <div className="bento-row">
+                        <div className="bento-col-12">
+                          <VendorRiskWidget navigateTo={navigateTo} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid-side">
+                      <ActivityTrail />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {activeTab === 'forms' && <FormEngine />}
+              {activeTab === 'ripd' && (
+                <RIPDModule 
+                  navigateTo={navigateTo} 
+                  onCopilotOpen={() => setIsCopilotOpen(true)} 
+                />
+              )}
+              {activeTab === 'mapping' && <MappingModule navigateTo={navigateTo} selectedId={selectedFilter} />}
+              {activeTab === 'vendor' && <VendorModule navigateTo={navigateTo} selectedId={selectedFilter} />}
+              {activeTab === 'vulnerability' && (
+                <VulnerabilityModule 
+                  navigateTo={navigateTo} 
+                  onCopilotOpen={() => setIsCopilotOpen(true)} 
+                />
+              )}
+              {activeTab === 'incident' && (
+                <IncidentModule 
+                  navigateTo={navigateTo} 
+                  onCopilotOpen={() => setIsCopilotOpen(true)} 
+                />
+              )}
+              {activeTab === 'legal-vault' && <LegalVaultModule navigateTo={navigateTo} onCopilotOpen={() => setIsCopilotOpen(true)} />}
+              {activeTab === 'dsar' && <DSARModule navigateTo={navigateTo} onCopilotOpen={() => setIsCopilotOpen(true)} />}
+
+              {/* Fallback for tabs not yet implemented */}
+              {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && activeTab !== 'vendor' && activeTab !== 'vulnerability' && activeTab !== 'incident' && activeTab !== 'legal-vault' && activeTab !== 'dsar' && (
+                <div className="placeholder-view">
+                  <h2 className="greeting-title">Módulo em Desenvolvimento</h2>
+                  <p className="greeting-subtitle">O recurso de {activeTab} está sendo integrado à infraestrutura DataSync.</p>
                 </div>
-              </div>
-
-              <div className="dashboard-grid">
-                <div className="grid-main">
-                  <div className="bento-row">
-                    <div className="bento-col-12">
-                      <EDiscoveryTool />
-                    </div>
-                  </div>
-
-                  <div className="bento-row">
-                    <div className="bento-col-12">
-                      <AIRIPDGenerator />
-                    </div>
-                  </div>
-
-                  <div className="bento-row">
-                    <div className="bento-col-8">
-                      <DataMappingInsight navigateTo={navigateTo} />
-                    </div>
-                    <div className="bento-col-4">
-                      <VulnerabilitySummary navigateTo={navigateTo} />
-                    </div>
-                  </div>
-
-                  <div className="bento-row">
-                    <div className="bento-col-12">
-                      <GovernanceScorecard data={calculatedScores} />
-                    </div>
-                  </div>
-
-                  <div className="bento-row">
-                    <div className="bento-col-12">
-                      <DataLineage />
-                    </div>
-                  </div>
-                  
-                  <div className="bento-row">
-                    <div className="bento-col-12">
-                      <VendorRiskWidget navigateTo={navigateTo} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid-side">
-                  <ActivityTrail />
-                </div>
-              </div>
-            </>
-          )}
-
-          {activeTab === 'forms' && <FormEngine />}
-          {activeTab === 'ripd' && (
-            <RIPDModule 
-              navigateTo={navigateTo} 
-              onCopilotOpen={() => setIsCopilotOpen(true)} 
-            />
-          )}
-          {activeTab === 'mapping' && <MappingModule navigateTo={navigateTo} selectedId={selectedFilter} />}
-          {activeTab === 'vendor' && <VendorModule navigateTo={navigateTo} selectedId={selectedFilter} />}
-          {activeTab === 'vulnerability' && (
-            <VulnerabilityModule 
-              navigateTo={navigateTo} 
-              onCopilotOpen={() => setIsCopilotOpen(true)} 
-            />
-          )}
-          {activeTab === 'incident' && (
-            <IncidentModule 
-              navigateTo={navigateTo} 
-              onCopilotOpen={() => setIsCopilotOpen(true)} 
-            />
-          )}
-          {activeTab === 'legal-vault' && <LegalVaultModule navigateTo={navigateTo} onCopilotOpen={() => setIsCopilotOpen(true)} />}
-          {activeTab === 'dsar' && <DSARModule navigateTo={navigateTo} onCopilotOpen={() => setIsCopilotOpen(true)} />}
-
-          {/* Fallback for tabs not yet implemented */}
-          {activeTab !== 'overview' && activeTab !== 'forms' && activeTab !== 'ripd' && activeTab !== 'mapping' && activeTab !== 'vendor' && activeTab !== 'vulnerability' && activeTab !== 'incident' && activeTab !== 'legal-vault' && activeTab !== 'dsar' && (
-            <div className="placeholder-view">
-              <h2 className="greeting-title">Módulo em Desenvolvimento</h2>
-              <p className="greeting-subtitle">O recurso de {activeTab} está sendo integrado à infraestrutura DataSync.</p>
+              )}
             </div>
-          )}
-        </div>
-      </main>
 
-      <PrivacyCopilot 
-        isOpen={isCopilotOpen} 
-        onClose={() => setIsCopilotOpen(false)} 
-      />
-      </div>
+            <PrivacyCopilot 
+              isOpen={isCopilotOpen} 
+              onClose={() => setIsCopilotOpen(false)} 
+            />
+          </main>
+        </div>
+      )}
 
       <style jsx>{`
         .portal-container {

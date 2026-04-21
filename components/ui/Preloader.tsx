@@ -37,7 +37,7 @@ export const Preloader: React.FC = () => {
 
   return (
     <div className="preloader-overlay">
-      <div className="scanline"></div>
+      <div className="scanline-global"></div>
       
       <div className="loader-content">
         <div className="logo-pulse">
@@ -56,31 +56,9 @@ export const Preloader: React.FC = () => {
 
       <style jsx>{`
         .preloader-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: #000;
-          z-index: 10000;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
           color: var(--accent);
-          font-family: 'JetBrains Mono', monospace;
-        }
-
-        .scanline {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 4px;
-          background: linear-gradient(to bottom, transparent, var(--accent), transparent);
-          opacity: 0.15;
-          animation: scanline 3s linear infinite;
-          pointer-events: none;
+          font-family: var(--font-jetbrains), monospace;
+          background: #000; /* Fallback */
         }
 
         .loader-content {
@@ -106,6 +84,7 @@ export const Preloader: React.FC = () => {
           min-width: 300px;
           justify-content: center;
           letter-spacing: 0.05em;
+          font-weight: 500;
         }
 
         .cursor {

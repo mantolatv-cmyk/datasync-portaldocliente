@@ -9,7 +9,6 @@ import { DataMappingInsight } from '@/components/dashboard/DataMappingInsight';
 import { ActivityTrail } from '@/components/dashboard/ActivityTrail';
 import { DataLineage } from '@/components/dashboard/DataLineage';
 import { GovernanceScorecard } from '@/components/dashboard/GovernanceScorecard';
-import { EDiscoveryTool } from '@/components/dashboard/EDiscoveryTool';
 import { AIRIPDGenerator } from '@/components/dashboard/AIRIPDGenerator';
 import { FormEngine } from '@/components/dashboard/FormEngine';
 import { RIPDModule } from '@/components/dashboard/RIPDModule';
@@ -136,12 +135,6 @@ function DashboardContent() {
 
                   <div className="dashboard-grid">
                     <div className="grid-main">
-                      <div className="bento-row">
-                        <div className="bento-col-12">
-                          <EDiscoveryTool />
-                        </div>
-                      </div>
-
                       <div className="bento-row">
                         <div className="bento-col-12">
                           <AIRIPDGenerator />
